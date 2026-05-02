@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexCode GT — Desarrollo Web · Guatemala</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #0a0c0f;
+      --bg2:       #0f1217;
+      --bg3:       #141820;
+      --border:    #1e2430;
+      --orange:    #f97316;
+      --orange2:   #fb923c;
+      --blue:      #3b82f6;
+      --blue2:     #60a5fa;
+      --text:      #e8eaf0;
+      --muted:     #6b7280;
+      --muted2:    #9ca3af;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE TEXTURE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(10,12,15,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.05rem;
+      color: var(--orange);
+      letter-spacing: -1px;
+    }
+
+    .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.02em;
+    }
+    .logo-text span { color: var(--blue); }
+
+    .logo-badge {
+      background: var(--orange);
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted2);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--orange);
+      color: #000 !important;
+      padding: 0.5rem 1.2rem;
+      border-radius: 6px;
+      font-weight: 700 !important;
+      font-size: 0.82rem !important;
+      transition: background 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--orange2) !important; }
+
+    /* ─── HERO ─── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 8rem 2.5rem 4rem;
+      overflow: hidden;
+    }
+
+    /* Glowing grid bg */
+    #hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 100%);
+      opacity: 0.4;
+      z-index: 0;
+    }
+
+    /* Gradient orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: 0;
+      animation: pulse 6s ease-in-out infinite;
+    }
+    .orb-1 { width: 500px; height: 500px; background: rgba(249,115,22,0.12); top: -100px; right: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(59,130,246,0.1); bottom: 0; left: -80px; animation-delay: 3s; }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(249,115,22,0.1);
+      border: 1px solid rgba(249,115,22,0.3);
+      color: var(--orange);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 100px;
+      margin-bottom: 1.8rem;
+      letter-spacing: 0.08em;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--orange);
+      border-radius: 50%;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 .accent { color: var(--orange); }
+    h1 .accent-blue { color: var(--blue2); }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--muted2);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--orange);
+      color: #000;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.85rem 1.8rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: var(--orange2); transform: translateY(-1px); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.9rem;
+      padding: 0.85rem 1.8rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--muted); background: var(--bg3); }
+
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--orange);
+    }
+    .stat-label { font-size: 0.78rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 0.2rem; }
+
+    /* ─── SECTION BASE ─── */
+    section { position: relative; z-index: 1; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 2.5rem;
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--orange);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      color: var(--muted2);
+      max-width: 500px;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+    }
+
+    /* ─── SERVICES ─── */
+    #servicios { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .service-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .service-card:hover { border-color: var(--orange); transform: translateY(-3px); }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--orange), var(--blue));
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .service-card:hover::before { opacity: 1; }
+
+    .service-icon {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.4rem;
+      color: var(--orange);
+      margin-bottom: 1rem;
+    }
+
+    .service-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+
+    .service-desc { color: var(--muted2); font-size: 0.9rem; line-height: 1.65; }
+
+    .service-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 1.2rem;
+    }
+    .tag {
+      font-size: 0.7rem;
+      font-family: 'Space Mono', monospace;
+      color: var(--blue2);
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.2);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+
+    /* ─── WHY US ─── */
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .why-item {
+      display: flex;
+      gap: 1rem;
+      padding: 1.5rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: border-color 0.2s;
+    }
+    .why-item:hover { border-color: rgba(249,115,22,0.4); }
+
+    .why-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .why-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .why-text { color: var(--muted2); font-size: 0.85rem; line-height: 1.6; }
+
+    /* ─── PROCESS ─── */
+    #proceso { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0;
+      position: relative;
+    }
+
+    .process-steps::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), var(--border), transparent);
+    }
+
+    .step {
+      padding: 0 1.5rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .step-num {
+      width: 56px; height: 56px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.2rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--orange);
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-desc { color: var(--muted2); font-size: 0.83rem; line-height: 1.6; }
+
+    /* ─── PORTFOLIO ─── */
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .portfolio-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .portfolio-card:hover { transform: translateY(-3px); border-color: rgba(59,130,246,0.4); }
+
+    .portfolio-thumb {
+      height: 180px;
+      background: var(--bg3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .portfolio-thumb.coming-soon {
+      background: repeating-linear-gradient(
+        45deg,
+        var(--bg3),
+        var(--bg3) 10px,
+        var(--bg) 10px,
+        var(--bg) 20px
+      );
+    }
+
+    .coming-badge {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 100px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    .portfolio-body { padding: 1.5rem; }
+
+    .portfolio-type {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--blue2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .portfolio-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .portfolio-desc { color: var(--muted2); font-size: 0.83rem; }
+
+    /* ─── PRICING ─── */
+    #precios { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .pricing-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem;
+      position: relative;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .pricing-card:hover { transform: translateY(-3px); }
+
+    .pricing-card.featured {
+      border-color: var(--orange);
+      background: linear-gradient(135deg, rgba(249,115,22,0.05), var(--bg3));
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--orange);
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.25rem 0.8rem;
+      border-radius: 100px;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .pricing-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .pricing-price {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--orange);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .pricing-price span {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 400;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .pricing-note { font-size: 0.78rem; color: var(--muted); margin-bottom: 1.5rem; }
+
+    .pricing-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.2rem 0;
+    }
+
+    .pricing-features { list-style: none; }
+    .pricing-features li {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      font-size: 0.85rem;
+      color: var(--muted2);
+      margin-bottom: 0.6rem;
+    }
+    .pricing-features li::before {
+      content: '✓';
+      color: var(--orange);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .pricing-cta {
+      display: block;
+      text-align: center;
+      margin-top: 1.5rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .pricing-cta.primary { background: var(--orange); color: #000; }
+    .pricing-cta.primary:hover { background: var(--orange2); }
+    .pricing-cta.secondary { border: 1px solid var(--border); color: var(--text); }
+    .pricing-cta.secondary:hover { border-color: var(--muted); background: var(--bg); }
+
+    /* ─── CONTACT ─── */
+    #contacto { text-align: center; }
+
+    .contact-box {
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--orange), var(--blue));
+    }
+
+    .contact-box h2 { margin-bottom: 0.8rem; }
+    .contact-box p { color: var(--muted2); margin-bottom: 2rem; }
+
+    .wa-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #25D366;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 1rem 2.2rem;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 0 30px rgba(37,211,102,0.2);
+    }
+    .wa-btn:hover { background: #20c55e; transform: translateY(-2px); }
+
+    .contact-alts {
+      margin-top: 1.5rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .contact-alts a { color: var(--blue2); text-decoration: none; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-copy {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .footer-links a {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.2rem; }
+      .nav-links { display: none; }
+      #hero { padding: 7rem 1.2rem 3rem; }
+      .container { padding: 3.5rem 1.2rem; }
+      .hero-stats { gap: 1.5rem; }
+      .why-grid { grid-template-columns: 1fr; }
+      .process-steps::before { display: none; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ─── PRICING TABS ─── */
+    .ptab {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--muted2);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 0.5rem 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ptab:hover { border-color: var(--muted); color: var(--text); }
+    .ptab.active {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: #000;
+      font-weight: 700;
+    }
+
+    /* ─── SCROLL ANIMATION ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <span class="logo-icon">{/}</span>
+    <span class="logo-text">Nex<span>Code</span></span>
+    <span class="logo-badge">GT</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#proceso">Proceso</a></li>
+    <li><a href="#portafolio">Portafolio</a></li>
+    <li><a href="#precios">Precios</a></li>
+    <li><a href="#contacto" class="nav-cta">Cotizar</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">🇬🇹 &nbsp;Desarrollo Web · Guatemala</div>
+    <h1>
+      Tu negocio,<br>
+      con <span class="accent">presencia digital</span><br>
+      que <span class="accent-blue">convierte</span>
+    </h1>
+    <p class="hero-sub">
+      Creamos páginas web, sistemas de inventario y software a la medida para pequeñas y medianas empresas guatemaltecas — sin costos mensuales innecesarios.
+    </p>
+    <div class="hero-actions">
+      <a href="#contacto" class="btn-primary">
+        💬 &nbsp;Cotiza tu proyecto
+      </a>
+      <a href="#servicios" class="btn-secondary">
+        Ver servicios →
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">Q0</div>
+        <div class="stat-label">Costo mensual de hosting</div>
+      </div>
+      <div>
+        <div class="stat-num">7</div>
+        <div class="stat-label">Días promedio de entrega</div>
+      </div>
+      <div>
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Hecho para Guatemala</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICIOS -->
+<section id="servicios">
+  <div class="container">
+    <div class="section-label">// Nuestros servicios</div>
+    <h2>Lo que construimos<br>para ti</h2>
+    <p class="section-desc">Soluciones digitales diseñadas para el mercado guatemalteco, con tecnología moderna y sin complicaciones.</p>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-icon">&lt;/&gt;</div>
+        <div class="service-title">Páginas Web Profesionales</div>
+        <div class="service-desc">Sitios modernos, rápidos y adaptados a celular. Presentamos tu negocio al mundo con una imagen que genera confianza y atrae clientes.</div>
+        <div class="service-tags">
+          <span class="tag">Landing page</span>
+          <span class="tag">Catálogo</span>
+          <span class="tag">Corporativo</span>
+        </div>
+      </div>
+      <div class="service-card reveal" style="transition-delay:0.1s">
+        <div class="service-icon">⚙️</div>
+        <div class="service-title">Software a la Medida</div>
+        <div class="service-desc">Sistemas diseñados exactamente para tu proceso de negocio. Olvídate de pagar por funciones que no usas — construimos lo que realmente necesitas.</div>
+        <div class="service-tags">
+          <span class="tag">Panel admin</span>
+          <span class="tag">Formularios</span>
+          <span class="tag">Automatización</span>
+        </div>
+      </div>
+      <div class="service-card reveal" style="transition-delay:0.2s">
+        <div class="service-icon">📦</div>
+        <div class="service-title">Sistemas de Inventario</div>
+        <div class="service-desc">Control de productos, entradas y salidas, alertas de stock bajo y reportes. Todo en tiempo real, accesible desde cualquier dispositivo.</div>
+        <div class="service-tags">
+          <span class="tag">Stock</span>
+          <span class="tag">Reportes</span>
+          <span class="tag">Multi-usuario</span>
+        </div>
+      </div>
+      <div class="service-card reveal" style="transition-delay:0.3s">
+        <div class="service-icon">💰</div>
+        <div class="service-title">Sistemas Contables</div>
+        <div class="service-desc">Registro de ingresos, egresos, pagos pendientes y estados de cuenta. Información clara para tomar mejores decisiones financieras.</div>
+        <div class="service-tags">
+          <span class="tag">Ingresos/Egresos</span>
+          <span class="tag">Pagos</span>
+          <span class="tag">Reportes SAT</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POR QUÉ ELEGIRNOS -->
+<section id="por-que">
+  <div class="container">
+    <div class="section-label">// ¿Por qué NexCode GT?</div>
+    <h2>Tecnología real,<br>sin letra pequeña</h2>
+    <p class="section-desc">Trabajamos diferente a otras agencias. Aquí no hay costos escondidos ni promesas vacías.</p>
+    <div class="why-grid">
+      <div class="why-item reveal">
+        <div class="why-icon">🚀</div>
+        <div>
+          <div class="why-title">Hosting gratuito de por vida</div>
+          <div class="why-text">Tu sitio vive en infraestructura de Google y GitHub sin costo mensual. Tu único gasto recurrente es el dominio anual (~$10/año desde el año 2).</div>
+        </div>
+      </div>
+      <div class="why-item reveal" style="transition-delay:0.1s">
+        <div class="why-icon">🇬🇹</div>
+        <div>
+          <div class="why-title">Entendemos el mercado local</div>
+          <div class="why-text">Integramos WhatsApp, Paggo y otras herramientas guatemaltecas. Sabemos cómo trabajan los negocios aquí.</div>
+        </div>
+      </div>
+      <div class="why-item reveal" style="transition-delay:0.15s">
+        <div class="why-icon">💡</div>
+        <div>
+          <div class="why-title">Precios transparentes</div>
+          <div class="why-text">Lo que cotizamos es lo que pagas. Sin sorpresas, sin cobros ocultos. Siempre sabrás exactamente en qué inviertes.</div>
+        </div>
+      </div>
+      <div class="why-item reveal" style="transition-delay:0.2s">
+        <div class="why-icon">🛠️</div>
+        <div>
+          <div class="why-title">Soporte continuo</div>
+          <div class="why-text">No desaparecemos tras entregar el proyecto. Ofrecemos planes de mantenimiento para que tu sistema siempre funcione perfectamente.</div>
+        </div>
+      </div>
+      <div class="why-item reveal" style="transition-delay:0.25s">
+        <div class="why-icon">📱</div>
+        <div>
+          <div class="why-title">100% adaptado a celular</div>
+          <div class="why-text">Todos nuestros proyectos funcionan perfecto en teléfono, tablet y computadora. Hoy en día no hay excusas.</div>
+        </div>
+      </div>
+      <div class="why-item reveal" style="transition-delay:0.3s">
+        <div class="why-icon">⚡</div>
+        <div>
+          <div class="why-title">Entrega rápida</div>
+          <div class="why-text">Proyectos estándar en 7–14 días hábiles. Trabajamos con metodología clara para que veas avances desde el inicio.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESO -->
+<section id="proceso">
+  <div class="container">
+    <div class="section-label">// Cómo trabajamos</div>
+    <h2>Simple, claro y<br>sin sorpresas</h2>
+    <p class="section-desc">Un proceso de 4 pasos para llevar tu idea a la realidad digital.</p>
+    <div class="process-steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div class="step-title">Consulta inicial</div>
+        <div class="step-desc">Conversamos por WhatsApp o llamada para entender tu negocio, necesidades y presupuesto. Sin costo, sin compromiso.</div>
+      </div>
+      <div class="step reveal" style="transition-delay:0.1s">
+        <div class="step-num">02</div>
+        <div class="step-title">Propuesta y cotización</div>
+        <div class="step-desc">Te enviamos una propuesta detallada con alcance, tiempo de entrega y precio exacto. Todo por escrito.</div>
+      </div>
+      <div class="step reveal" style="transition-delay:0.2s">
+        <div class="step-num">03</div>
+        <div class="step-title">Desarrollo</div>
+        <div class="step-desc">Construimos tu proyecto con actualizaciones periódicas. Puedes dar retroalimentación en cada etapa.</div>
+      </div>
+      <div class="step reveal" style="transition-delay:0.3s">
+        <div class="step-num">04</div>
+        <div class="step-title">Entrega y soporte</div>
+        <div class="step-desc">Lanzamos tu proyecto y te enseñamos a usarlo. Seguimos disponibles para dudas y ajustes posteriores.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTAFOLIO -->
+<section id="portafolio">
+  <div class="container">
+    <div class="section-label">// Portafolio</div>
+    <h2>Ejemplos de lo que<br>podemos construir</h2>
+    <p class="section-desc">Estos son algunos tipos de sitios y sistemas que desarrollamos. Cada proyecto se adapta a la imagen y necesidades de tu negocio.</p>
+    <div class="portfolio-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+
+      <!-- Template 1: Restaurante -->
+      <div class="portfolio-card reveal">
+        <div class="portfolio-thumb" style="background: linear-gradient(135deg, #1a0a00 0%, #2d1200 100%); padding: 0; overflow:hidden; position:relative;">
+          <svg width="100%" height="100%" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <!-- BG -->
+            <rect width="320" height="180" fill="#1a0800"/>
+            <!-- Top bar -->
+            <rect width="320" height="28" fill="#0f0500"/>
+            <circle cx="16" cy="14" r="4" fill="#f97316" opacity="0.8"/>
+            <rect x="28" y="10" width="60" height="8" rx="2" fill="#f97316" opacity="0.6"/>
+            <rect x="200" y="10" width="30" height="8" rx="2" fill="#ffffff" opacity="0.15"/>
+            <rect x="238" y="10" width="30" height="8" rx="2" fill="#ffffff" opacity="0.15"/>
+            <rect x="276" y="8" width="36" height="12" rx="3" fill="#f97316" opacity="0.9"/>
+            <!-- Hero image placeholder -->
+            <rect x="0" y="28" width="320" height="80" fill="#2d1200"/>
+            <text x="160" y="60" text-anchor="middle" font-size="22" fill="#f97316" font-family="serif" font-weight="bold">🍽️</text>
+            <text x="160" y="82" text-anchor="middle" font-size="11" fill="#fff" font-family="sans-serif" font-weight="bold">RESTAURANTE LA FOGATA</text>
+            <text x="160" y="96" text-anchor="middle" font-size="7" fill="#f97316" font-family="sans-serif">SABORES GUATEMALTECOS DESDE 1998</text>
+            <!-- Menu section -->
+            <rect x="8" y="116" width="92" height="56" rx="4" fill="#2a1000"/>
+            <rect x="108" y="116" width="92" height="56" rx="4" fill="#2a1000"/>
+            <rect x="208" y="116" width="104" height="56" rx="4" fill="#2a1000"/>
+            <text x="54" y="132" text-anchor="middle" font-size="7" fill="#f97316" font-family="sans-serif">PLATO TÍPICO</text>
+            <text x="54" y="144" text-anchor="middle" font-size="9" fill="#fff" font-family="sans-serif" font-weight="bold">Pepián</text>
+            <text x="54" y="155" text-anchor="middle" font-size="8" fill="#f97316" font-family="sans-serif">Q 85.00</text>
+            <text x="154" y="132" text-anchor="middle" font-size="7" fill="#f97316" font-family="sans-serif">ESPECIAL</text>
+            <text x="154" y="144" text-anchor="middle" font-size="9" fill="#fff" font-family="sans-serif" font-weight="bold">Kak'ik</text>
+            <text x="154" y="155" text-anchor="middle" font-size="8" fill="#f97316" font-family="sans-serif">Q 95.00</text>
+            <text x="260" y="132" text-anchor="middle" font-size="7" fill="#f97316" font-family="sans-serif">COMBO</text>
+            <text x="260" y="144" text-anchor="middle" font-size="9" fill="#fff" font-family="sans-serif" font-weight="bold">Almuerzo del día</text>
+            <text x="260" y="155" text-anchor="middle" font-size="8" fill="#f97316" font-family="sans-serif">Q 55.00</text>
+            <!-- WA button -->
+            <rect x="100" y="175" width="120" height="0" rx="3" fill="#25D366" opacity="0"/>
+          </svg>
+        </div>
+        <div class="portfolio-body">
+          <div class="portfolio-type">Restaurante · Menú Digital</div>
+          <div class="portfolio-name">Página para Restaurante</div>
+          <div class="portfolio-desc">Menú digital con precios, galería de platillos, horarios, ubicación y botón de pedidos por WhatsApp.</div>
+        </div>
+      </div>
+
+      <!-- Template 2: Centro Educativo -->
+      <div class="portfolio-card reveal" style="transition-delay:0.1s">
+        <div class="portfolio-thumb" style="background:#050d1a; overflow:hidden; position:relative;">
+          <svg width="100%" height="100%" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="180" fill="#060e1c"/>
+            <!-- Top bar -->
+            <rect width="320" height="28" fill="#030a14"/>
+            <text x="14" y="18" font-size="10" fill="#3b82f6" font-family="sans-serif" font-weight="bold">{/} COLEGIO SAN MARCOS</text>
+            <rect x="240" y="9" width="70" height="10" rx="2" fill="#3b82f6" opacity="0.15"/>
+            <text x="275" y="18" text-anchor="middle" font-size="7" fill="#60a5fa" font-family="sans-serif">Inscripciones 2025</text>
+            <!-- Hero -->
+            <rect x="0" y="28" width="200" height="90" fill="#0a1628"/>
+            <text x="100" y="58" text-anchor="middle" font-size="9" fill="#60a5fa" font-family="sans-serif" font-weight="bold">🎓 EXCELENCIA EDUCATIVA</text>
+            <text x="100" y="74" text-anchor="middle" font-size="13" fill="#fff" font-family="sans-serif" font-weight="bold">Formando líderes</text>
+            <text x="100" y="88" text-anchor="middle" font-size="13" fill="#fff" font-family="sans-serif" font-weight="bold">del mañana</text>
+            <rect x="20" y="100" width="80" height="14" rx="4" fill="#3b82f6"/>
+            <text x="60" y="110" text-anchor="middle" font-size="7" fill="#fff" font-family="sans-serif" font-weight="bold">Ver niveles →</text>
+            <rect x="110" y="100" width="80" height="14" rx="4" fill="transparent" stroke="#3b82f6" stroke-width="1"/>
+            <text x="150" y="110" text-anchor="middle" font-size="7" fill="#60a5fa" font-family="sans-serif">Inscribirse</text>
+            <!-- Sidebar stats -->
+            <rect x="204" y="28" width="116" height="90" fill="#040c1a"/>
+            <rect x="212" y="36" width="100" height="32" rx="4" fill="#0a1628"/>
+            <text x="262" y="50" text-anchor="middle" font-size="14" fill="#3b82f6" font-family="sans-serif" font-weight="bold">850+</text>
+            <text x="262" y="62" text-anchor="middle" font-size="7" fill="#9ca3af" font-family="sans-serif">Estudiantes</text>
+            <rect x="212" y="74" width="100" height="32" rx="4" fill="#0a1628"/>
+            <text x="262" y="88" text-anchor="middle" font-size="14" fill="#f97316" font-family="sans-serif" font-weight="bold">25+</text>
+            <text x="262" y="100" text-anchor="middle" font-size="7" fill="#9ca3af" font-family="sans-serif">Años de experiencia</text>
+            <!-- Niveles -->
+            <rect x="0" y="122" width="320" height="58" fill="#040c1a"/>
+            <rect x="8" y="130" width="72" height="42" rx="4" fill="#0a1628"/>
+            <rect x="88" y="130" width="72" height="42" rx="4" fill="#0a1628"/>
+            <rect x="168" y="130" width="72" height="42" rx="4" fill="#0a1628"/>
+            <rect x="248" y="130" width="64" height="42" rx="4" fill="#0a1628"/>
+            <text x="44" y="148" text-anchor="middle" font-size="8" fill="#60a5fa" font-family="sans-serif">🧒</text>
+            <text x="44" y="160" text-anchor="middle" font-size="7" fill="#fff" font-family="sans-serif">Preprimaria</text>
+            <text x="124" y="148" text-anchor="middle" font-size="8" fill="#60a5fa" font-family="sans-serif">📚</text>
+            <text x="124" y="160" text-anchor="middle" font-size="7" fill="#fff" font-family="sans-serif">Primaria</text>
+            <text x="204" y="148" text-anchor="middle" font-size="8" fill="#60a5fa" font-family="sans-serif">🏫</text>
+            <text x="204" y="160" text-anchor="middle" font-size="7" fill="#fff" font-family="sans-serif">Básicos</text>
+            <text x="280" y="148" text-anchor="middle" font-size="8" fill="#60a5fa" font-family="sans-serif">🎓</text>
+            <text x="280" y="160" text-anchor="middle" font-size="7" fill="#fff" font-family="sans-serif">Diversificado</text>
+          </svg>
+        </div>
+        <div class="portfolio-body">
+          <div class="portfolio-type">Centro Educativo · Página Web</div>
+          <div class="portfolio-name">Página para Colegio o Academia</div>
+          <div class="portfolio-desc">Presentación de niveles, información de inscripciones, galería, personal docente y formulario de contacto.</div>
+        </div>
+      </div>
+
+      <!-- Template 3: Agencia / Servicios -->
+      <div class="portfolio-card reveal" style="transition-delay:0.2s">
+        <div class="portfolio-thumb" style="background:#080a10; overflow:hidden;">
+          <svg width="100%" height="100%" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="180" fill="#080a10"/>
+            <rect width="320" height="28" fill="#050608"/>
+            <text x="14" y="18" font-size="10" fill="#f97316" font-family="monospace" font-weight="bold">{/} NEXCODE GT</text>
+            <rect x="200" y="9" width="38" height="10" rx="2" fill="none" stroke="#1e2430" stroke-width="1"/>
+            <text x="219" y="17" text-anchor="middle" font-size="6" fill="#9ca3af" font-family="sans-serif">Servicios</text>
+            <rect x="246" y="9" width="38" height="10" rx="2" fill="none" stroke="#1e2430" stroke-width="1"/>
+            <text x="265" y="17" text-anchor="middle" font-size="6" fill="#9ca3af" font-family="sans-serif">Portafolio</text>
+            <rect x="290" y="8" width="24" height="12" rx="3" fill="#f97316"/>
+            <text x="302" y="17" text-anchor="middle" font-size="6" fill="#000" font-family="sans-serif" font-weight="bold">Cotizar</text>
+            <!-- Hero with grid bg -->
+            <rect x="0" y="28" width="320" height="95" fill="#080a10"/>
+            <line x1="0" y1="48" x2="320" y2="48" stroke="#1e2430" stroke-width="0.5"/>
+            <line x1="0" y1="68" x2="320" y2="68" stroke="#1e2430" stroke-width="0.5"/>
+            <line x1="0" y1="88" x2="320" y2="88" stroke="#1e2430" stroke-width="0.5"/>
+            <line x1="0" y1="108" x2="320" y2="108" stroke="#1e2430" stroke-width="0.5"/>
+            <line x1="60" y1="28" x2="60" y2="123" stroke="#1e2430" stroke-width="0.5"/>
+            <line x1="120" y1="28" x2="120" y2="123" stroke="#1e2430" stroke-width="0.5"/>
+            <line x1="180" y1="28" x2="180" y2="123" stroke="#1e2430" stroke-width="0.5"/>
+            <line x1="240" y1="28" x2="240" y2="123" stroke="#1e2430" stroke-width="0.5"/>
+            <line x1="300" y1="28" x2="300" y2="123" stroke="#1e2430" stroke-width="0.5"/>
+            <circle cx="280" cy="60" r="60" fill="#f97316" opacity="0.06"/>
+            <circle cx="40" cy="110" r="45" fill="#3b82f6" opacity="0.05"/>
+            <text x="30" y="58" font-size="7" fill="#f97316" font-family="monospace">// Tu negocio digital</text>
+            <text x="30" y="74" font-size="16" fill="#fff" font-family="sans-serif" font-weight="bold">Páginas web que</text>
+            <text x="30" y="92" font-size="16" fill="#f97316" font-family="sans-serif" font-weight="bold">generan clientes</text>
+            <rect x="30" y="100" width="70" height="14" rx="4" fill="#f97316"/>
+            <text x="65" y="110" text-anchor="middle" font-size="7" fill="#000" font-family="sans-serif" font-weight="bold">💬 Cotizar ahora</text>
+            <rect x="108" y="100" width="60" height="14" rx="4" fill="none" stroke="#1e2430" stroke-width="1"/>
+            <text x="138" y="110" text-anchor="middle" font-size="7" fill="#9ca3af" font-family="sans-serif">Ver servicios →</text>
+            <!-- Cards row -->
+            <rect x="0" y="125" width="320" height="55" fill="#0f1217"/>
+            <rect x="8" y="132" width="92" height="40" rx="4" fill="#141820" stroke="#1e2430" stroke-width="1"/>
+            <rect x="108" y="132" width="92" height="40" rx="4" fill="#141820" stroke="#1e2430" stroke-width="1"/>
+            <rect x="208" y="132" width="104" height="40" rx="4" fill="#141820" stroke="#1e2430" stroke-width="1"/>
+            <text x="54" y="147" text-anchor="middle" font-size="10" fill="#f97316">🌐</text>
+            <text x="54" y="160" text-anchor="middle" font-size="7" fill="#fff" font-family="sans-serif">Páginas Web</text>
+            <text x="154" y="147" text-anchor="middle" font-size="10" fill="#3b82f6">⚙️</text>
+            <text x="154" y="160" text-anchor="middle" font-size="7" fill="#fff" font-family="sans-serif">Software a medida</text>
+            <text x="260" y="147" text-anchor="middle" font-size="10" fill="#f97316">📦</text>
+            <text x="260" y="160" text-anchor="middle" font-size="7" fill="#fff" font-family="sans-serif">Sistemas</text>
+          </svg>
+        </div>
+        <div class="portfolio-body">
+          <div class="portfolio-type">Empresa de Servicios · Página Web</div>
+          <div class="portfolio-name">Página Corporativa / Servicios</div>
+          <div class="portfolio-desc">Presentación profesional de tu empresa, servicios destacados, precios y formulario de contacto integrado.</div>
+        </div>
+      </div>
+
+      <!-- Template 4: Sistema de Inventario -->
+      <div class="portfolio-card reveal" style="transition-delay:0.3s">
+        <div class="portfolio-thumb" style="background:#060d0a; overflow:hidden;">
+          <svg width="100%" height="100%" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="180" fill="#060d0a"/>
+            <!-- Sidebar -->
+            <rect width="70" height="180" fill="#040a07"/>
+            <text x="35" y="22" text-anchor="middle" font-size="8" fill="#22c55e" font-family="monospace" font-weight="bold">{/}</text>
+            <rect x="8" y="32" width="54" height="18" rx="3" fill="#0d1f14"/>
+            <text x="35" y="44" text-anchor="middle" font-size="7" fill="#22c55e" font-family="sans-serif">📦 Inventario</text>
+            <rect x="8" y="54" width="54" height="18" rx="3" fill="none"/>
+            <text x="35" y="66" text-anchor="middle" font-size="7" fill="#4b5563" font-family="sans-serif">💰 Ventas</text>
+            <rect x="8" y="76" width="54" height="18" rx="3" fill="none"/>
+            <text x="35" y="88" text-anchor="middle" font-size="7" fill="#4b5563" font-family="sans-serif">👥 Clientes</text>
+            <rect x="8" y="98" width="54" height="18" rx="3" fill="none"/>
+            <text x="35" y="110" text-anchor="middle" font-size="7" fill="#4b5563" font-family="sans-serif">📊 Reportes</text>
+            <!-- Main area -->
+            <rect x="70" y="0" width="250" height="28" fill="#050b08"/>
+            <text x="85" y="17" font-size="9" fill="#fff" font-family="sans-serif" font-weight="bold">Panel de Inventario</text>
+            <rect x="270" y="8" width="40" height="14" rx="3" fill="#22c55e"/>
+            <text x="290" y="18" text-anchor="middle" font-size="7" fill="#000" font-family="sans-serif" font-weight="bold">+ Producto</text>
+            <!-- Stat cards -->
+            <rect x="76" y="34" width="56" height="34" rx="3" fill="#0d1f14"/>
+            <text x="104" y="46" text-anchor="middle" font-size="7" fill="#9ca3af" font-family="sans-serif">Total productos</text>
+            <text x="104" y="60" text-anchor="middle" font-size="13" fill="#22c55e" font-family="sans-serif" font-weight="bold">248</text>
+            <rect x="138" y="34" width="56" height="34" rx="3" fill="#1a0d00"/>
+            <text x="166" y="46" text-anchor="middle" font-size="7" fill="#9ca3af" font-family="sans-serif">Stock bajo</text>
+            <text x="166" y="60" text-anchor="middle" font-size="13" fill="#f97316" font-family="sans-serif" font-weight="bold">12</text>
+            <rect x="200" y="34" width="56" height="34" rx="3" fill="#0a0d1a"/>
+            <text x="228" y="46" text-anchor="middle" font-size="7" fill="#9ca3af" font-family="sans-serif">Ventas hoy</text>
+            <text x="228" y="60" text-anchor="middle" font-size="13" fill="#3b82f6" font-family="sans-serif" font-weight="bold">Q 2,840</text>
+            <rect x="262" y="34" width="52" height="34" rx="3" fill="#0d1f14"/>
+            <text x="288" y="46" text-anchor="middle" font-size="7" fill="#9ca3af" font-family="sans-serif">Categorías</text>
+            <text x="288" y="60" text-anchor="middle" font-size="13" fill="#22c55e" font-family="sans-serif" font-weight="bold">8</text>
+            <!-- Table -->
+            <rect x="76" y="74" width="238" height="100" rx="3" fill="#0d1f14"/>
+            <rect x="76" y="74" width="238" height="16" rx="3" fill="#091508"/>
+            <text x="90" y="85" font-size="6" fill="#6b7280" font-family="sans-serif">PRODUCTO</text>
+            <text x="180" y="85" font-size="6" fill="#6b7280" font-family="sans-serif">STOCK</text>
+            <text x="220" y="85" font-size="6" fill="#6b7280" font-family="sans-serif">PRECIO</text>
+            <text x="270" y="85" font-size="6" fill="#6b7280" font-family="sans-serif">ESTADO</text>
+            <text x="90" y="100" font-size="6.5" fill="#e8eaf0" font-family="sans-serif">Arroz Imperial 1lb</text>
+            <text x="180" y="100" font-size="6.5" fill="#fff" font-family="sans-serif">142</text>
+            <text x="220" y="100" font-size="6.5" fill="#fff" font-family="sans-serif">Q 8.50</text>
+            <rect x="265" y="93" width="36" height="10" rx="3" fill="#14532d"/>
+            <text x="283" y="101" text-anchor="middle" font-size="6" fill="#22c55e" font-family="sans-serif">OK</text>
+            <line x1="76" y1="107" x2="314" y2="107" stroke="#1a2e1a" stroke-width="0.5"/>
+            <text x="90" y="118" font-size="6.5" fill="#e8eaf0" font-family="sans-serif">Aceite Capullo 1L</text>
+            <text x="180" y="118" font-size="6.5" fill="#f97316" font-family="sans-serif">8</text>
+            <text x="220" y="118" font-size="6.5" fill="#fff" font-family="sans-serif">Q 24.00</text>
+            <rect x="260" y="111" width="46" height="10" rx="3" fill="#431407"/>
+            <text x="283" y="119" text-anchor="middle" font-size="6" fill="#f97316" font-family="sans-serif">BAJO</text>
+            <line x1="76" y1="125" x2="314" y2="125" stroke="#1a2e1a" stroke-width="0.5"/>
+            <text x="90" y="136" font-size="6.5" fill="#e8eaf0" font-family="sans-serif">Frijol negro 1lb</text>
+            <text x="180" y="136" font-size="6.5" fill="#fff" font-family="sans-serif">310</text>
+            <text x="220" y="136" font-size="6.5" fill="#fff" font-family="sans-serif">Q 6.00</text>
+            <rect x="265" y="129" width="36" height="10" rx="3" fill="#14532d"/>
+            <text x="283" y="137" text-anchor="middle" font-size="6" fill="#22c55e" font-family="sans-serif">OK</text>
+            <line x1="76" y1="143" x2="314" y2="143" stroke="#1a2e1a" stroke-width="0.5"/>
+            <text x="90" y="154" font-size="6.5" fill="#e8eaf0" font-family="sans-serif">Azúcar Pantaleón 2lb</text>
+            <text x="180" y="154" font-size="6.5" fill="#fff" font-family="sans-serif">89</text>
+            <text x="220" y="154" font-size="6.5" fill="#fff" font-family="sans-serif">Q 15.00</text>
+            <rect x="265" y="147" width="36" height="10" rx="3" fill="#14532d"/>
+            <text x="283" y="155" text-anchor="middle" font-size="6" fill="#22c55e" font-family="sans-serif">OK</text>
+          </svg>
+        </div>
+        <div class="portfolio-body">
+          <div class="portfolio-type">Sistema · Inventario y Ventas</div>
+          <div class="portfolio-name">Sistema de Inventario</div>
+          <div class="portfolio-desc">Control de productos, alertas de stock bajo, registro de ventas y reportes. Acceso desde cualquier dispositivo.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PRECIOS -->
+<section id="precios">
+  <div class="container">
+    <div class="section-label">// Precios</div>
+    <h2>Inversión clara<br>sin sorpresas</h2>
+    <p class="section-desc">Precios pensados para el mercado guatemalteco. Sin costos mensuales de hosting — solo pagas el desarrollo y el dominio anual.</p>
+
+    <!-- Tabs -->
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:2rem;">
+      <button class="ptab active" data-tab="general" onclick="switchTab('general')">General</button>
+      <button class="ptab" data-tab="educacion" onclick="switchTab('educacion')">🎓 Educación</button>
+      <button class="ptab" data-tab="restaurante" onclick="switchTab('restaurante')">🍽️ Restaurantes</button>
+      <button class="ptab" data-tab="academia" onclick="switchTab('academia')">🏋️ Academias</button>
+    </div>
+
+    <!-- GENERAL -->
+    <div id="tab-general" class="tab-panel">
+      <div class="pricing-grid">
+        <div class="pricing-card reveal">
+          <div class="pricing-name">Página Básica</div>
+          <div class="pricing-price">Q1,500 <span>único</span></div>
+          <div class="pricing-note">+ dominio anual por parte del cliente</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>Diseño personalizado responsive</li>
+            <li>Hasta 4 secciones</li>
+            <li>Botón de WhatsApp</li>
+            <li>Formulario de contacto</li>
+            <li>Hosting gratuito (GitHub Pages)</li>
+            <li>Entrega en 7 días hábiles</li>
+          </ul>
+          <a href="#contacto" class="pricing-cta secondary">Cotizar →</a>
+        </div>
+        <div class="pricing-card featured reveal" style="transition-delay:0.1s">
+          <div class="featured-badge">⭐ MÁS SOLICITADO</div>
+          <div class="pricing-name">Sistema + Web</div>
+          <div class="pricing-price">Q3,500 <span>único</span></div>
+          <div class="pricing-note">+ Q250/mes mantenimiento opcional</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>Todo lo del plan básico</li>
+            <li>Panel administrativo</li>
+            <li>Gestión de clientes o inventario</li>
+            <li>Control de pagos y estados</li>
+            <li>Base de datos en la nube</li>
+            <li>Integración con Paggo</li>
+            <li>Entrega en 14 días hábiles</li>
+          </ul>
+          <a href="#contacto" class="pricing-cta primary">Cotizar →</a>
+        </div>
+        <div class="pricing-card reveal" style="transition-delay:0.2s">
+          <div class="pricing-name">Software a la Medida</div>
+          <div class="pricing-price">Desde <span style="font-size:1.4rem;color:var(--orange)">Q5,000</span></div>
+          <div class="pricing-note">Cotización personalizada según alcance</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>Sistema diseñado para tu proceso</li>
+            <li>Múltiples usuarios y roles</li>
+            <li>Reportes y estadísticas</li>
+            <li>Integraciones con otras plataformas</li>
+            <li>Capacitación incluida</li>
+            <li>Soporte prioritario</li>
+          </ul>
+          <a href="#contacto" class="pricing-cta secondary">Solicitar cotización →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDUCACIÓN -->
+    <div id="tab-educacion" class="tab-panel" style="display:none">
+      <div class="pricing-grid">
+        <div class="pricing-card reveal">
+          <div class="pricing-name">Página del Colegio</div>
+          <div class="pricing-price">Q2,000 <span>único</span></div>
+          <div class="pricing-note">+ dominio anual por parte del colegio</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>Diseño institucional profesional</li>
+            <li>Presentación de niveles educativos</li>
+            <li>Sección de inscripciones con formulario</li>
+            <li>Galería de instalaciones</li>
+            <li>Información de maestros y autoridades</li>
+            <li>Botón de WhatsApp para consultas</li>
+            <li>Entrega en 10 días hábiles</li>
+          </ul>
+          <a href="#contacto" class="pricing-cta secondary">Cotizar →</a>
+        </div>
+        <div class="pricing-card featured reveal" style="transition-delay:0.1s">
+          <div class="featured-badge">⭐ RECOMENDADO</div>
+          <div class="pricing-name">Sistema Escolar Completo</div>
+          <div class="pricing-price">Q6,000 <span>único</span></div>
+          <div class="pricing-note">+ Q250/mes mantenimiento opcional</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>Página institucional incluida</li>
+            <li>Panel administrativo para directivos</li>
+            <li>Gestión de alumnos y expedientes</li>
+            <li>Control de pagos y mensualidades</li>
+            <li>Alertas de pagos vencidos</li>
+            <li>Registro de notas por período</li>
+            <li>Reportes exportables</li>
+            <li>Capacitación al personal</li>
+          </ul>
+          <a href="#contacto" class="pricing-cta primary">Cotizar →</a>
+        </div>
+        <div class="pricing-card reveal" style="transition-delay:0.2s">
+          <div class="pricing-name">Sistema Avanzado</div>
+          <div class="pricing-price">Desde <span style="font-size:1.4rem;color:var(--orange)">Q9,000</span></div>
+          <div class="pricing-note">Para colegios con 300+ estudiantes</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>Todo lo del plan completo</li>
+            <li>Portal para padres de familia</li>
+            <li>Envío de circulares digitales</li>
+            <li>Control de asistencia</li>
+            <li>Múltiples sedes o secciones</li>
+            <li>Integración con pagos en línea</li>
+            <li>Soporte prioritario</li>
+          </ul>
+          <a href="#contacto" class="pricing-cta secondary">Solicitar cotización →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESTAURANTES -->
+    <div id="tab-restaurante" class="tab-panel" style="display:none">
+      <div class="pricing-grid">
+        <div class="pricing-card reveal">
+          <div class="pricing-name">Menú Digital</div>
+          <div class="pricing-price">Q1,500 <span>único</span></div>
+          <div class="pricing-note">+ dominio anual por parte del restaurante</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>Menú digital con categorías y precios</li>
+            <li>Galería de platillos</li>
+            <li>Horarios y ubicación</li>
+            <li>Botón de pedidos por WhatsApp</li>
+            <li>Diseño adaptado a tu imagen</li>
+            <li>Entrega en 7 días hábiles</li>
+          </ul>
+          <a href="#contacto" class="pricing-cta secondary">Cotizar →</a>
+        </div>
+        <div class="pricing-card featured reveal" style="transition-delay:0.1s">
+          <div class="featured-badge">⭐ MÁS SOLICITADO</div>
+          <div class="pricing-name">Página + Sistema de Pedidos</div>
+          <div class="pricing-price">Q3,500 <span>único</span></div>
+          <div class="pricing-note">+ Q250/mes mantenimiento opcional</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>Menú digital completo</li>
+            <li>Sistema de pedidos en línea</li>
+            <li>Panel para gestionar pedidos</li>
+            <li>Notificaciones por WhatsApp</li>
+            <li>Control de mesas o delivery</li>
+            <li>Integración con Paggo</li>
+            <li>Entrega en 14 días hábiles</li>
+          </ul>
+          <a href="#contacto" class="pricing-cta primary">Cotizar →</a>
+        </div>
+        <div class="pricing-card reveal" style="transition-delay:0.2s">
+          <div class="pricing-name">Sistema de Cocina</div>
+          <div class="pricing-price">Desde <span style="font-size:1.4rem;color:var(--orange)">Q5,000</span></div>
+          <div class="pricing-note">Para restaurantes con mayor volumen</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>Todo el plan anterior incluido</li>
+            <li>Control de inventario de ingredientes</li>
+            <li>Alertas de stock de cocina</li>
+            <li>Reportes de ventas diarias</li>
+            <li>Gestión de personal</li>
+            <li>Múltiples sucursales</li>
+          </ul>
+          <a href="#contacto" class="pricing-cta secondary">Solicitar cotización →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACADEMIAS -->
+    <div id="tab-academia" class="tab-panel" style="display:none">
+      <div class="pricing-grid">
+        <div class="pricing-card reveal">
+          <div class="pricing-name">Página de Academia</div>
+          <div class="pricing-price">Q1,800 <span>único</span></div>
+          <div class="pricing-note">+ dominio anual por parte de la academia</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>Presentación de clases y horarios</li>
+            <li>Galería de instalaciones</li>
+            <li>Información de instructores</li>
+            <li>Formulario de inscripción</li>
+            <li>Botón de WhatsApp</li>
+            <li>Entrega en 7 días hábiles</li>
+          </ul>
+          <a href="#contacto" class="pricing-cta secondary">Cotizar →</a>
+        </div>
+        <div class="pricing-card featured reveal" style="transition-delay:0.1s">
+          <div class="featured-badge">⭐ RECOMENDADO</div>
+          <div class="pricing-name">Sistema de Membresías</div>
+          <div class="pricing-price">Q3,500 <span>único</span></div>
+          <div class="pricing-note">+ Q250/mes mantenimiento opcional</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>Página de academia incluida</li>
+            <li>Control de miembros activos</li>
+            <li>Seguimiento de pagos mensuales</li>
+            <li>Alertas de membresías por vencer</li>
+            <li>Registro de asistencia</li>
+            <li>Panel administrativo completo</li>
+            <li>Entrega en 14 días hábiles</li>
+          </ul>
+          <a href="#contacto" class="pricing-cta primary">Cotizar →</a>
+        </div>
+        <div class="pricing-card reveal" style="transition-delay:0.2s">
+          <div class="pricing-name">Sistema Avanzado</div>
+          <div class="pricing-price">Desde <span style="font-size:1.4rem;color:var(--orange)">Q5,000</span></div>
+          <div class="pricing-note">Para academias con múltiples disciplinas</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-features">
+            <li>Todo el plan de membresías</li>
+            <li>Múltiples disciplinas o sucursales</li>
+            <li>App web para miembros</li>
+            <li>Integración con pagos en línea</li>
+            <li>Reportes de rendimiento</li>
+            <li>Control de equipos y préstamos</li>
+          </ul>
+          <a href="#contacto" class="pricing-cta secondary">Solicitar cotización →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto">
+  <div class="container">
+    <div class="contact-box reveal">
+      <div class="section-label" style="text-align:center">// Contáctanos</div>
+      <h2>¿Listo para empezar?</h2>
+      <p>Cuéntanos tu idea y te respondemos en menos de 24 horas con una propuesta sin compromiso.</p>
+      <a href="https://wa.me/50245940312?text=Hola%2C%20me%20interesa%20cotizar%20un%20proyecto%20con%20NexCode%20GT" class="wa-btn" target="_blank">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Escríbenos por WhatsApp
+      </a>
+      <div class="contact-alts">
+        También por correo: <a href="nexcodegt@gmail.com>contacto@nexcodegt.com</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">© 2025 NexCode GT · Desarrollo Web · Guatemala</div>
+  <div class="footer-links">
+    <a href="https://www.facebook.com/NexCodeGT/" target="_blank">Facebook</a>
+    <a href="#servicios">Servicios</a>
+    <a href="#precios">Precios</a>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Pricing tabs
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tab).style.display = 'block';
+    document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+    // re-trigger reveals in new panel
+    document.querySelectorAll('#tab-' + tab + ' .reveal').forEach(el => {
+      el.classList.remove('visible');
+      setTimeout(() => el.classList.add('visible'), 80);
+    });
+  }
+</script>
+
+</body>
+</html>
