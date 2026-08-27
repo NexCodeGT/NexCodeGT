@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Contable — Demo NexCode GT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-900:#0d1b2a;
+    --navy-800:#132840;
+    --navy-700:#1c3552;
+    --line:#25405e;
+    --gold:#d4a24e;
+    --gold-dim:#8a6a2e;
+    --emerald:#3aa576;
+    --emerald-bg:#123024;
+    --rose:#d16a6a;
+    --rose-bg:#341418;
+    --paper:#eef1f5;
+    --muted:#7f92a8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--navy-900);
+    color:var(--paper);
+    display:flex;
+    min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  h1,h2,h3,.disp{font-family:'Sora',sans-serif;}
+
+  /* SIDEBAR */
+  .sidebar{
+    width:230px;flex-shrink:0;
+    background:var(--navy-800);
+    border-right:1px solid var(--line);
+    padding:22px 16px;
+    display:flex;flex-direction:column;
+    gap:26px;
+  }
+  .brand{display:flex;align-items:center;gap:9px;padding:0 6px;}
+  .brand-mark{
+    width:32px;height:32px;border-radius:6px;
+    background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;color:var(--navy-900);font-weight:800;
+  }
+  .brand-name{font-family:'Sora',sans-serif;font-weight:700;font-size:15px;}
+  .brand-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.05em;}
+
+  nav{display:flex;flex-direction:column;gap:3px;}
+  nav a{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;border-radius:8px;
+    color:var(--muted);text-decoration:none;
+    font-size:13.5px;font-weight:500;
+    cursor:pointer;
+    transition:background .15s, color .15s;
+  }
+  nav a:hover{background:var(--navy-700);color:var(--paper);}
+  nav a.active{background:var(--navy-700);color:var(--gold);}
+  nav a .ic{font-size:15px;width:18px;text-align:center;}
+
+  .sidebar-foot{
+    margin-top:auto;
+    border-top:1px solid var(--line);
+    padding-top:14px;
+    font-size:11px;color:var(--muted);
+    font-family:'IBM Plex Mono',monospace;
+  }
+
+  /* MAIN */
+  main{flex:1;padding:26px 32px;max-width:1180px;}
+  .topbar{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    margin-bottom:24px;flex-wrap:wrap;gap:14px;
+  }
+  .topbar h1{font-size:22px;font-weight:700;margin-bottom:4px;}
+  .topbar .date{font-size:12.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+  .btn-gold{
+    background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+    color:var(--navy-900);font-weight:700;font-size:13px;
+    padding:10px 18px;border-radius:8px;border:none;cursor:pointer;
+    display:flex;align-items:center;gap:7px;
+  }
+  .btn-gold:hover{filter:brightness(1.08);}
+
+  /* SUMMARY CARDS */
+  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+  @media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr);}}
+  .card{
+    background:var(--navy-800);border:1px solid var(--line);
+    border-radius:12px;padding:16px 18px;
+  }
+  .card .label{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+  .card .value{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;}
+  .card.balance .value{color:var(--gold);}
+  .card.ingresos .value{color:var(--emerald);}
+  .card.egresos .value{color:var(--rose);}
+  .card .delta{font-size:11px;margin-top:5px;color:var(--muted);}
+
+  /* CHART */
+  .panel{
+    background:var(--navy-800);border:1px solid var(--line);
+    border-radius:12px;padding:20px;margin-bottom:22px;
+  }
+  .panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .panel-head h2{font-size:15px;font-weight:600;}
+  .legend{display:flex;gap:16px;font-size:11.5px;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:8px;height:8px;border-radius:50%;}
+  .dot.g{background:var(--emerald);}
+  .dot.r{background:var(--rose);}
+
+  .chart{display:flex;align-items:flex-end;gap:18px;height:150px;padding:0 4px;}
+  .barcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .bars{display:flex;gap:4px;align-items:flex-end;height:120px;}
+  .bar{width:16px;border-radius:3px 3px 0 0;}
+  .bar.g{background:var(--emerald);}
+  .bar.r{background:var(--rose);}
+  .barcol .m{font-size:10.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+
+  /* TABLE */
+  .tabs{display:flex;gap:6px;margin-bottom:14px;}
+  .tab{
+    background:transparent;border:1px solid var(--line);color:var(--muted);
+    font-size:12.5px;padding:7px 14px;border-radius:7px;cursor:pointer;font-family:'Inter',sans-serif;
+  }
+  .tab.active{background:var(--navy-700);color:var(--paper);border-color:var(--gold-dim);}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{
+    text-align:left;font-size:10.5px;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.04em;padding:8px 10px;border-bottom:1px solid var(--line);font-weight:600;
+  }
+  tbody td{padding:11px 10px;border-bottom:1px solid var(--line);}
+  tbody tr:hover{background:rgba(255,255,255,0.02);}
+  .amt{font-family:'IBM Plex Mono',monospace;font-weight:600;text-align:right;}
+  .amt.pos{color:var(--emerald);}
+  .amt.neg{color:var(--rose);}
+  .pill{font-size:10.5px;padding:3px 9px;border-radius:20px;font-weight:600;}
+  .pill.ingreso{background:var(--emerald-bg);color:var(--emerald);}
+  .pill.egreso{background:var(--rose-bg);color:var(--rose);}
+  .desc-cell{color:var(--paper);}
+  .cat-cell{color:var(--muted);font-size:12px;}
+
+  /* QUICK ADD FORM */
+  .form-row{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr auto;gap:10px;align-items:end;}
+  @media(max-width:900px){.form-row{grid-template-columns:1fr 1fr;}}
+  .field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;}
+  .field input, .field select{
+    width:100%;background:var(--navy-900);border:1px solid var(--line);color:var(--paper);
+    padding:9px 10px;border-radius:7px;font-size:13px;font-family:'Inter',sans-serif;
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--gold-dim);}
+
+  .toast{
+    position:fixed;bottom:24px;right:24px;
+    background:var(--emerald-bg);border:1px solid var(--emerald);color:var(--emerald);
+    padding:12px 18px;border-radius:8px;font-size:13px;font-weight:600;
+    opacity:0;transform:translateY(10px);transition:all .25s ease;pointer-events:none;
+  }
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  footer.demo-note{
+    margin-top:20px;text-align:center;font-size:11.5px;color:var(--muted);
+    font-family:'IBM Plex Mono',monospace;
+  }
+  footer.demo-note b{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">Q</div>
+    <div>
+      <div class="brand-name">ContaFácil</div>
+      <div class="brand-sub">SISTEMA CONTABLE</div>
+    </div>
+  </div>
+  <nav>
+    <a class="active"><span class="ic">📊</span> Dashboard</a>
+    <a><span class="ic">💵</span> Ingresos</a>
+    <a><span class="ic">🧾</span> Egresos</a>
+    <a><span class="ic">📄</span> Reportes</a>
+    <a><span class="ic">🏦</span> Cuentas por cobrar</a>
+    <a><span class="ic">⚙️</span> Configuración</a>
+  </nav>
+  <div class="sidebar-foot">EMPRESA DEMO S.A.<br>NIT: 000000-0</div>
+</div>
+
+<main>
+  <div class="topbar">
+    <div>
+      <h1>Panel Contable</h1>
+      <div class="date">Agosto 2026 · Última actualización: hoy</div>
+    </div>
+    <button class="btn-gold" onclick="showToast('Reporte PDF generado (demo)')">📄 Generar reporte</button>
+  </div>
+
+  <div class="summary">
+    <div class="card balance">
+      <div class="label">Balance Actual</div>
+      <div class="value mono" id="balanceVal">Q 42,180</div>
+      <div class="delta">Ingresos − Egresos del mes</div>
+    </div>
+    <div class="card ingresos">
+      <div class="label">Ingresos del Mes</div>
+      <div class="value mono" id="ingresosVal">Q 68,450</div>
+      <div class="delta">↑ 12% vs. mes anterior</div>
+    </div>
+    <div class="card egresos">
+      <div class="label">Egresos del Mes</div>
+      <div class="value mono" id="egresosVal">Q 26,270</div>
+      <div class="delta">↓ 4% vs. mes anterior</div>
+    </div>
+    <div class="card">
+      <div class="label">Cuentas por Cobrar</div>
+      <div class="value mono">Q 9,300</div>
+      <div class="delta">3 facturas pendientes</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Ingresos vs. Egresos · Últimos 6 meses</h2>
+      <div class="legend"><span><i class="dot g"></i>Ingresos</span><span><i class="dot r"></i>Egresos</span></div>
+    </div>
+    <div class="chart">
+      <div class="barcol"><div class="bars"><div class="bar g" style="height:70px"></div><div class="bar r" style="height:38px"></div></div><div class="m">MAR</div></div>
+      <div class="barcol"><div class="bars"><div class="bar g" style="height:82px"></div><div class="bar r" style="height:45px"></div></div><div class="m">ABR</div></div>
+      <div class="barcol"><div class="bars"><div class="bar g" style="height:64px"></div><div class="bar r" style="height:50px"></div></div><div class="m">MAY</div></div>
+      <div class="barcol"><div class="bars"><div class="bar g" style="height:95px"></div><div class="bar r" style="height:40px"></div></div><div class="m">JUN</div></div>
+      <div class="barcol"><div class="bars"><div class="bar g" style="height:88px"></div><div class="bar r" style="height:55px"></div></div><div class="m">JUL</div></div>
+      <div class="barcol"><div class="bars"><div class="bar g" style="height:110px"></div><div class="bar r" style="height:42px"></div></div><div class="m">AGO</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Registrar movimiento rápido</h2></div>
+    <div class="form-row">
+      <div class="field"><label>Descripción</label><input id="fDesc" type="text" placeholder="Ej. Pago proveedor"></div>
+      <div class="field"><label>Categoría</label><input id="fCat" type="text" placeholder="Ej. Servicios"></div>
+      <div class="field"><label>Tipo</label>
+        <select id="fTipo"><option value="ingreso">Ingreso</option><option value="egreso">Egreso</option></select>
+      </div>
+      <div class="field"><label>Monto (Q)</label><input id="fMonto" type="number" placeholder="0.00"></div>
+      <button class="btn-gold" onclick="addMovimiento()">+ Agregar</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Movimientos recientes</h2></div>
+    <div class="tabs">
+      <button class="tab active" data-f="todos" onclick="filterTable('todos')">Todos</button>
+      <button class="tab" data-f="ingreso" onclick="filterTable('ingreso')">Ingresos</button>
+      <button class="tab" data-f="egreso" onclick="filterTable('egreso')">Egresos</button>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Tipo</th><th style="text-align:right">Monto</th></tr>
+      </thead>
+      <tbody id="txBody"></tbody>
+    </table>
+  </div>
+
+  <footer class="demo-note">Prototipo de demostración · Diseñado por <b>{/} NexCode GT</b> · Datos ficticios, este sistema no procesa información real.</footer>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let transactions = [
+    {fecha:'22 ago', desc:'Venta mostrador', cat:'Ventas', tipo:'ingreso', monto:4200},
+    {fecha:'21 ago', desc:'Pago energía eléctrica', cat:'Servicios', tipo:'egreso', monto:850},
+    {fecha:'20 ago', desc:'Venta al por mayor', cat:'Ventas', tipo:'ingreso', monto:12500},
+    {fecha:'19 ago', desc:'Compra de insumos', cat:'Inventario', tipo:'egreso', monto:3100},
+    {fecha:'18 ago', desc:'Servicio de consultoría', cat:'Honorarios', tipo:'ingreso', monto:6000},
+    {fecha:'17 ago', desc:'Pago planilla', cat:'Nómina', tipo:'egreso', monto:9800},
+    {fecha:'16 ago', desc:'Venta mostrador', cat:'Ventas', tipo:'ingreso', monto:2100},
+    {fecha:'15 ago', desc:'Renta local', cat:'Renta', tipo:'egreso', monto:4500},
+  ];
+  let currentFilter = 'todos';
+
+  function renderTable(){
+    const body = document.getElementById('txBody');
+    const rows = transactions.filter(t => currentFilter==='todos' || t.tipo===currentFilter);
+    body.innerHTML = rows.map(t => `
+      <tr>
+        <td class="mono" style="color:var(--muted)">${t.fecha}</td>
+        <td class="desc-cell">${t.desc}</td>
+        <td class="cat-cell">${t.cat}</td>
+        <td><span class="pill ${t.tipo}">${t.tipo==='ingreso'?'Ingreso':'Egreso'}</span></td>
+        <td class="amt ${t.tipo==='ingreso'?'pos':'neg'}">${t.tipo==='ingreso'?'+':'−'} Q ${t.monto.toLocaleString('es-GT')}</td>
+      </tr>`).join('');
+  }
+
+  function filterTable(f){
+    currentFilter = f;
+    document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.f===f));
+    renderTable();
+  }
+
+  function recalcSummary(){
+    const ingresos = transactions.filter(t=>t.tipo==='ingreso').reduce((s,t)=>s+t.monto,0);
+    const egresos = transactions.filter(t=>t.tipo==='egreso').reduce((s,t)=>s+t.monto,0);
+    document.getElementById('ingresosVal').textContent = 'Q ' + ingresos.toLocaleString('es-GT');
+    document.getElementById('egresosVal').textContent = 'Q ' + egresos.toLocaleString('es-GT');
+    document.getElementById('balanceVal').textContent = 'Q ' + (ingresos-egresos).toLocaleString('es-GT');
+  }
+
+  function addMovimiento(){
+    const desc = document.getElementById('fDesc').value.trim();
+    const cat = document.getElementById('fCat').value.trim() || 'General';
+    const tipo = document.getElementById('fTipo').value;
+    const monto = parseFloat(document.getElementById('fMonto').value);
+    if(!desc || !monto || monto<=0){ showToast('Completa descripción y monto'); return; }
+    transactions.unshift({fecha:'Hoy', desc, cat, tipo, monto});
+    document.getElementById('fDesc').value='';
+    document.getElementById('fCat').value='';
+    document.getElementById('fMonto').value='';
+    renderTable();
+    recalcSummary();
+    showToast('Movimiento registrado correctamente');
+  }
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2200);
+  }
+
+  renderTable();
+</script>
+
+</body>
+</html>
