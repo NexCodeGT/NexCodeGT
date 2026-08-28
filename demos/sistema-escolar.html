@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Escolar — Demo NexCode GT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --indigo-900:#131a3d;
+    --indigo-800:#1b2452;
+    --indigo-700:#26316b;
+    --line:#31407f;
+    --sky:#5b9dff;
+    --sky-bg:#152451;
+    --amber:#f2ab3d;
+    --amber-bg:#3a2c10;
+    --green:#48b884;
+    --green-bg:#0f3226;
+    --rose:#e06a7c;
+    --rose-bg:#3a1622;
+    --paper:#eef1fb;
+    --muted:#8791b8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--indigo-900);
+    color:var(--paper);
+    display:flex;
+    min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  h1,h2,.disp{font-family:'Baloo 2',sans-serif;}
+
+  /* SIDEBAR */
+  .sidebar{
+    width:230px;flex-shrink:0;
+    background:var(--indigo-800);
+    border-right:1px solid var(--line);
+    padding:22px 16px;
+    display:flex;flex-direction:column;gap:26px;
+  }
+  .brand{display:flex;align-items:center;gap:9px;padding:0 6px;}
+  .brand-mark{
+    width:34px;height:34px;border-radius:9px;
+    background:linear-gradient(135deg,var(--sky),#8a6bf0);
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;
+  }
+  .brand-name{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;}
+  .brand-sub{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--muted);letter-spacing:.05em;}
+
+  nav{display:flex;flex-direction:column;gap:3px;}
+  nav a{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;border-radius:9px;
+    color:var(--muted);text-decoration:none;
+    font-size:13.5px;font-weight:500;cursor:pointer;
+    transition:background .15s, color .15s;
+  }
+  nav a:hover{background:var(--indigo-700);color:var(--paper);}
+  nav a.active{background:var(--indigo-700);color:var(--sky);}
+  nav a .ic{font-size:15px;width:18px;text-align:center;}
+
+  .sidebar-foot{
+    margin-top:auto;border-top:1px solid var(--line);padding-top:14px;
+    font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;
+  }
+
+  /* MAIN */
+  main{flex:1;padding:26px 32px;max-width:1180px;}
+  .topbar{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    margin-bottom:24px;flex-wrap:wrap;gap:14px;
+  }
+  .topbar h1{font-size:22px;font-weight:700;margin-bottom:4px;}
+  .topbar .date{font-size:12.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+  .btn-sky{
+    background:linear-gradient(135deg,var(--sky),#8a6bf0);
+    color:#0d1330;font-weight:700;font-size:13px;
+    padding:10px 18px;border-radius:9px;border:none;cursor:pointer;
+    display:flex;align-items:center;gap:7px;
+  }
+  .btn-sky:hover{filter:brightness(1.08);}
+
+  /* SUMMARY */
+  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+  @media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr);}}
+  .card{background:var(--indigo-800);border:1px solid var(--line);border-radius:13px;padding:16px 18px;}
+  .card .label{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+  .card .value{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:var(--sky);}
+  .card .delta{font-size:11px;margin-top:5px;color:var(--muted);}
+
+  .panel{background:var(--indigo-800);border:1px solid var(--line);border-radius:13px;padding:20px;margin-bottom:22px;}
+  .panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .panel-head h2{font-size:15px;font-weight:600;}
+
+  /* GRADE LEVEL BREAKDOWN */
+  .levels{display:flex;gap:14px;flex-wrap:wrap;}
+  .level-chip{
+    flex:1;min-width:120px;background:var(--indigo-700);border:1px solid var(--line);
+    border-radius:10px;padding:14px;text-align:center;
+  }
+  .level-chip .n{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--sky);}
+  .level-chip .l{font-size:11.5px;color:var(--muted);margin-top:3px;}
+
+  /* FORM */
+  .form-row{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr auto;gap:10px;align-items:end;}
+  @media(max-width:900px){.form-row{grid-template-columns:1fr 1fr;}}
+  .field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;}
+  .field input, .field select{
+    width:100%;background:var(--indigo-900);border:1px solid var(--line);color:var(--paper);
+    padding:9px 10px;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--sky);}
+
+  /* TABLE */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{
+    text-align:left;font-size:10.5px;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.04em;padding:8px 10px;border-bottom:1px solid var(--line);font-weight:600;
+  }
+  tbody td{padding:11px 10px;border-bottom:1px solid var(--line);}
+  tbody tr:hover{background:rgba(255,255,255,0.02);}
+  .stu-name{color:var(--paper);font-weight:500;}
+  .stu-grade{color:var(--muted);font-size:12px;}
+  .prom{font-family:'IBM Plex Mono',monospace;font-weight:600;}
+  .prom.good{color:var(--green);}
+  .prom.warn{color:var(--amber);}
+  .prom.bad{color:var(--rose);}
+
+  .pill{font-size:10.5px;padding:4px 11px;border-radius:20px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
+  .pill.presente{background:var(--green-bg);color:var(--green);}
+  .pill.ausente{background:var(--rose-bg);color:var(--rose);}
+
+  .toast{
+    position:fixed;bottom:24px;right:24px;
+    background:var(--green-bg);border:1px solid var(--green);color:var(--green);
+    padding:12px 18px;border-radius:9px;font-size:13px;font-weight:600;
+    opacity:0;transform:translateY(10px);transition:all .25s ease;pointer-events:none;
+  }
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  footer.demo-note{margin-top:20px;text-align:center;font-size:11.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+  footer.demo-note b{color:var(--sky);}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">🎓</div>
+    <div>
+      <div class="brand-name">EduGestión</div>
+      <div class="brand-sub">SISTEMA ESCOLAR</div>
+    </div>
+  </div>
+  <nav>
+    <a class="active"><span class="ic">📊</span> Dashboard</a>
+    <a><span class="ic">🧑‍🎓</span> Estudiantes</a>
+    <a><span class="ic">📝</span> Calificaciones</a>
+    <a><span class="ic">🗓️</span> Asistencia</a>
+    <a><span class="ic">💳</span> Pagos</a>
+    <a><span class="ic">📣</span> Comunicados</a>
+  </nav>
+  <div class="sidebar-foot">COLEGIO SAN MARCOS<br>CICLO 2026</div>
+</div>
+
+<main>
+  <div class="topbar">
+    <div>
+      <h1>Panel Escolar</h1>
+      <div class="date">3ro Básico Sección A · Hoy, 27 de agosto</div>
+    </div>
+    <button class="btn-sky" onclick="showToast('Circular enviada a padres de familia (demo)')">📣 Enviar circular</button>
+  </div>
+
+  <div class="summary">
+    <div class="card"><div class="label">Total Estudiantes</div><div class="value">312</div><div class="delta">8 secciones activas</div></div>
+    <div class="card"><div class="label">Asistencia Hoy</div><div class="value" id="asistVal">94%</div><div class="delta" id="asistDelta">6 ausencias registradas</div></div>
+    <div class="card"><div class="label">Promedio General</div><div class="value">82.4</div><div class="delta">↑ 2.1 pts vs. bimestre anterior</div></div>
+    <div class="card"><div class="label">Pagos Pendientes</div><div class="value">14</div><div class="delta">Mensualidad de agosto</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Estudiantes por nivel</h2></div>
+    <div class="levels">
+      <div class="level-chip"><div class="n">68</div><div class="l">Preprimaria</div></div>
+      <div class="level-chip"><div class="n">104</div><div class="l">Primaria</div></div>
+      <div class="level-chip"><div class="n">86</div><div class="l">Básicos</div></div>
+      <div class="level-chip"><div class="n">54</div><div class="l">Diversificado</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Registrar calificación rápida</h2></div>
+    <div class="form-row">
+      <div class="field"><label>Estudiante</label>
+        <select id="fStu"></select>
+      </div>
+      <div class="field"><label>Materia</label><input id="fMat" type="text" placeholder="Ej. Matemática"></div>
+      <div class="field"><label>Nota (0-100)</label><input id="fNota" type="number" min="0" max="100" placeholder="0"></div>
+      <div class="field"><label>Período</label>
+        <select id="fPeriodo"><option>Bimestre 3</option><option>Bimestre 4</option></select>
+      </div>
+      <button class="btn-sky" onclick="addNota()">+ Registrar</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Lista de estudiantes — 3ro Básico A</h2></div>
+    <table>
+      <thead>
+        <tr><th>Estudiante</th><th>Grado</th><th>Promedio</th><th>Asistencia hoy</th></tr>
+      </thead>
+      <tbody id="stuBody"></tbody>
+    </table>
+  </div>
+
+  <footer class="demo-note">Prototipo de demostración · Diseñado por <b>{/} NexCode GT</b> · Datos ficticios, este sistema no procesa información real.</footer>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let students = [
+    {nombre:'María Fernanda López', grado:'3ro Básico A', promedio:91, asistencia:'presente'},
+    {nombre:'Carlos Estuardo Pérez', grado:'3ro Básico A', promedio:74, asistencia:'presente'},
+    {nombre:'Ana Lucía Ramírez', grado:'3ro Básico A', promedio:88, asistencia:'ausente'},
+    {nombre:'Diego Alejandro Cux', grado:'3ro Básico A', promedio:65, asistencia:'presente'},
+    {nombre:'Sofía Valentina Ixchop', grado:'3ro Básico A', promedio:95, asistencia:'presente'},
+    {nombre:'José Manuel Barrios', grado:'3ro Básico A', promedio:79, asistencia:'presente'},
+    {nombre:'Camila Andrea Sagastume', grado:'3ro Básico A', promedio:58, asistencia:'ausente'},
+    {nombre:'Luis Fernando Xitumul', grado:'3ro Básico A', promedio:83, asistencia:'presente'},
+  ];
+
+  function promClass(p){
+    if(p>=80) return 'good';
+    if(p>=65) return 'warn';
+    return 'bad';
+  }
+
+  function renderStudents(){
+    const body = document.getElementById('stuBody');
+    body.innerHTML = students.map((s,i) => `
+      <tr>
+        <td class="stu-name">${s.nombre}</td>
+        <td class="stu-grade">${s.grado}</td>
+        <td class="prom ${promClass(s.promedio)}">${s.promedio.toFixed(1)}</td>
+        <td><button class="pill ${s.asistencia}" onclick="toggleAsistencia(${i})">${s.asistencia==='presente'?'✓ Presente':'✕ Ausente'}</button></td>
+      </tr>`).join('');
+
+    const sel = document.getElementById('fStu');
+    sel.innerHTML = students.map(s => `<option>${s.nombre}</option>`).join('');
+  }
+
+  function toggleAsistencia(i){
+    students[i].asistencia = students[i].asistencia==='presente' ? 'ausente' : 'presente';
+    renderStudents();
+    recalcAsistencia();
+  }
+
+  function recalcAsistencia(){
+    const total = students.length;
+    const presentes = students.filter(s=>s.asistencia==='presente').length;
+    const pct = Math.round((presentes/total)*100);
+    document.getElementById('asistVal').textContent = pct + '%';
+    document.getElementById('asistDelta').textContent = (total-presentes) + ' ausencias registradas';
+  }
+
+  function addNota(){
+    const nombre = document.getElementById('fStu').value;
+    const mat = document.getElementById('fMat').value.trim();
+    const nota = parseFloat(document.getElementById('fNota').value);
+    if(!mat || isNaN(nota) || nota<0 || nota>100){ showToast('Completa materia y una nota válida (0-100)'); return; }
+    const s = students.find(s=>s.nombre===nombre);
+    if(s){
+      s.promedio = Math.round(((s.promedio + nota) / 2) * 10) / 10;
+    }
+    document.getElementById('fMat').value='';
+    document.getElementById('fNota').value='';
+    renderStudents();
+    showToast(`Nota de ${mat} registrada para ${nombre}`);
+  }
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2300);
+  }
+
+  renderStudents();
+  recalcAsistencia();
+</script>
+
+</body>
+</html>
