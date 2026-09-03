@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ColegioPanel — Sistema de Gestión Escolar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#122A4B;
+    --navy-light:#1E3F6E;
+    --gold:#E8A33D;
+    --gold-light:#FBE4BE;
+    --green:#2E9E5B;
+    --red:#D9534F;
+    --amber:#E0972B;
+    --bg:#F4F6F9;
+    --card:#FFFFFF;
+    --border:#E3E8EF;
+    --text:#1B2733;
+    --text-light:#6B7A8F;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+  }
+  h1,h2,h3,.brand{font-family:'Poppins',sans-serif;}
+
+  /* Header */
+  header{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);
+    color:#fff;
+    padding:20px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  .brand-block{display:flex;align-items:center;gap:12px;}
+  .logo{
+    width:44px;height:44px;border-radius:10px;
+    background:var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;color:var(--navy);font-size:18px;font-family:'Poppins',sans-serif;
+  }
+  .brand-title{font-weight:700;font-size:19px;}
+  .brand-sub{font-size:12.5px;color:#C9D6E8;}
+  .header-stats{display:flex;gap:22px;flex-wrap:wrap;}
+  .hstat{text-align:right;}
+  .hstat .num{font-weight:700;font-size:18px;font-family:'Poppins',sans-serif;color:var(--gold);}
+  .hstat .lbl{font-size:11px;color:#C9D6E8;text-transform:uppercase;letter-spacing:.04em;}
+
+  /* Tabs */
+  nav.tabs{
+    display:flex;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    padding:0 20px;
+    overflow-x:auto;
+  }
+  nav.tabs button{
+    border:none;background:none;
+    padding:16px 18px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    color:var(--text-light);
+    cursor:pointer;
+    border-bottom:3px solid transparent;
+    white-space:nowrap;
+    transition:.15s;
+  }
+  nav.tabs button:hover{color:var(--navy);}
+  nav.tabs button.active{color:var(--navy);border-bottom-color:var(--gold);}
+
+  main{max-width:1080px;margin:0 auto;padding:26px 20px 60px;}
+  .panel{display:none;}
+  .panel.active{display:block;animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .panel-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
+  .panel-head h2{font-size:21px;color:var(--navy);}
+  .panel-head p{font-size:13px;color:var(--text-light);margin-top:3px;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+    margin-bottom:18px;
+    box-shadow:0 1px 3px rgba(18,42,75,.04);
+  }
+
+  /* Form */
+  .form-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;}
+  @media(max-width:720px){.form-row{grid-template-columns:1fr;}}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:5px;text-transform:uppercase;letter-spacing:.03em;}
+  .field input, .field select{
+    width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;
+    font-family:'Inter',sans-serif;font-size:14px;background:#FBFCFE;
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--gold);}
+  .btn{
+    background:var(--navy);color:#fff;border:none;border-radius:8px;
+    padding:10px 18px;font-weight:600;font-size:14px;cursor:pointer;
+    font-family:'Inter',sans-serif;transition:.15s;white-space:nowrap;
+  }
+  .btn:hover{background:var(--navy-light);}
+  .btn.gold{background:var(--gold);color:var(--navy);}
+  .btn.gold:hover{background:var(--amber);}
+  .btn.small{padding:6px 12px;font-size:12.5px;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{
+    text-align:left;color:var(--text-light);font-weight:600;font-size:11.5px;
+    text-transform:uppercase;letter-spacing:.03em;padding:10px 10px;border-bottom:2px solid var(--border);
+  }
+  td{padding:12px 10px;border-bottom:1px solid var(--border);}
+  tr:last-child td{border-bottom:none;}
+  .avatar{
+    width:30px;height:30px;border-radius:50%;background:var(--gold-light);color:var(--navy);
+    display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;margin-right:8px;
+  }
+  .name-cell{display:flex;align-items:center;}
+
+  .badge{padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:700;display:inline-block;cursor:pointer;user-select:none;border:none;}
+  .badge.pagado{background:#DEF5E6;color:var(--green);}
+  .badge.pendiente{background:#FDF1DC;color:var(--amber);}
+  .badge.atrasado{background:#FBE3E2;color:var(--red);}
+
+  .stat-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+  .stat-card{
+    flex:1;min-width:150px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;
+  }
+  .stat-card .num{font-family:'Poppins',sans-serif;font-weight:700;font-size:24px;color:var(--navy);}
+  .stat-card .lbl{font-size:12px;color:var(--text-light);margin-top:2px;}
+  .stat-card.accent{border-color:var(--gold);background:linear-gradient(135deg,#fff,var(--gold-light) 220%);}
+
+  .toggle-view{display:flex;gap:8px;margin-bottom:18px;}
+  .toggle-view button{
+    padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:#fff;
+    font-weight:600;font-size:13px;cursor:pointer;color:var(--text-light);
+  }
+  .toggle-view button.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+  .switch{position:relative;display:inline-block;width:42px;height:24px;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#DCE3EC;border-radius:24px;transition:.2s;}
+  .slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s;}
+  input:checked + .slider{background:var(--green);}
+  input:checked + .slider:before{transform:translateX(18px);}
+
+  .bar-bg{background:#EEF1F6;border-radius:6px;height:8px;width:100%;overflow:hidden;margin-top:6px;}
+  .bar-fill{height:100%;border-radius:6px;background:var(--gold);transition:width .4s ease;}
+
+  .grade-select{margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .grade-select select{padding:9px 12px;border-radius:8px;border:1px solid var(--border);font-family:'Inter',sans-serif;font-size:13.5px;}
+
+  .nota-input{width:64px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;text-align:center;font-family:'Inter',sans-serif;}
+  .nota-avg{font-weight:700;padding:3px 9px;border-radius:20px;font-size:12.5px;}
+  .nota-avg.good{background:#DEF5E6;color:var(--green);}
+  .nota-avg.bad{background:#FBE3E2;color:var(--red);}
+
+  .empty{text-align:center;color:var(--text-light);padding:30px 10px;font-size:13.5px;}
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--navy);color:#fff;padding:12px 22px;border-radius:10px;font-size:13.5px;font-weight:600;
+    opacity:0;pointer-events:none;transition:.25s;box-shadow:0 8px 20px rgba(0,0,0,.2);z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  footer{text-align:center;padding:22px;font-size:12px;color:var(--text-light);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-block">
+    <div class="logo">CP</div>
+    <div>
+      <div class="brand-title">ColegioPanel</div>
+      <div class="brand-sub">Sistema de gestión administrativa escolar — Demo</div>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="hstat"><div class="num" id="statAlumnos">0</div><div class="lbl">Alumnos</div></div>
+    <div class="hstat"><div class="num" id="statAsistencia">0%</div><div class="lbl">Asistencia</div></div>
+    <div class="hstat"><div class="num" id="statCobrado">Q0</div><div class="lbl">Cobrado</div></div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="inscripciones">📋 Inscripciones</button>
+  <button class="tab-btn" data-tab="mensualidades">💳 Mensualidades</button>
+  <button class="tab-btn" data-tab="asistencia">✅ Asistencia</button>
+  <button class="tab-btn" data-tab="notas">📊 Notas</button>
+</nav>
+
+<main>
+
+  <!-- INSCRIPCIONES -->
+  <section class="panel active" id="panel-inscripciones">
+    <div class="panel-head">
+      <div>
+        <h2>Inscripciones</h2>
+        <p>Registra nuevos alumnos y consulta el listado general.</p>
+      </div>
+    </div>
+    <div class="card">
+      <form id="formInscripcion">
+        <div class="form-row">
+          <div class="field">
+            <label>Nombre del alumno</label>
+            <input type="text" id="inNombre" placeholder="Ej. Ana Martínez" required>
+          </div>
+          <div class="field">
+            <label>Grado</label>
+            <select id="inGrado">
+              <option>1ro Primaria</option>
+              <option>2do Primaria</option>
+              <option>3ro Primaria</option>
+              <option>4to Primaria</option>
+              <option>5to Primaria</option>
+              <option>6to Primaria</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Teléfono responsable</label>
+            <input type="text" id="inTelefono" placeholder="Ej. 5555-1234">
+          </div>
+          <button type="submit" class="btn gold">+ Inscribir</button>
+        </div>
+      </form>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Alumno</th><th>Grado</th><th>Teléfono</th><th>Estado de pago</th></tr></thead>
+        <tbody id="tablaInscripciones"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- MENSUALIDADES -->
+  <section class="panel" id="panel-mensualidades">
+    <div class="panel-head">
+      <div>
+        <h2>Mensualidades</h2>
+        <p>Da clic sobre el estado de pago para actualizarlo.</p>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-card accent"><div class="num" id="mCobrado">Q0</div><div class="lbl">Total cobrado este mes</div></div>
+      <div class="stat-card"><div class="num" id="mPendiente">0</div><div class="lbl">Pagos pendientes</div></div>
+      <div class="stat-card"><div class="num" id="mAtrasado">0</div><div class="lbl">Pagos atrasados</div></div>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Alumno</th><th>Grado</th><th>Monto mensual</th><th>Estado</th></tr></thead>
+        <tbody id="tablaMensualidades"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ASISTENCIA -->
+  <section class="panel" id="panel-asistencia">
+    <div class="panel-head">
+      <div>
+        <h2>Asistencia</h2>
+        <p>El maestro marca asistencia; el administrador ve el porcentaje reflejado al instante.</p>
+      </div>
+    </div>
+    <div class="toggle-view">
+      <button class="view-btn active" data-view="maestro">👩‍🏫 Vista Maestro</button>
+      <button class="view-btn" data-view="admin">🏫 Vista Administrador</button>
+    </div>
+
+    <div id="asistenciaMaestro">
+      <div class="grade-select">
+        <select id="asisGrado"></select>
+        <button class="btn small" id="btnRegistrarAsistencia">Registrar asistencia de hoy</button>
+        <span style="font-size:12.5px;color:var(--text-light);">Día actual: <strong id="diaActual">Día 1</strong></span>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Alumno</th><th style="text-align:right;">Presente</th></tr></thead>
+          <tbody id="tablaAsistenciaMaestro"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="asistenciaAdmin" style="display:none;">
+      <div class="card">
+        <table>
+          <thead><tr><th>Grado</th><th>Alumnos</th><th style="width:40%;">% de asistencia</th></tr></thead>
+          <tbody id="tablaAsistenciaAdmin"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTAS -->
+  <section class="panel" id="panel-notas">
+    <div class="panel-head">
+      <div>
+        <h2>Notas</h2>
+        <p>Panel de captura para maestros y consolidado general para dirección.</p>
+      </div>
+    </div>
+    <div class="toggle-view">
+      <button class="view-btn active" data-view="maestro">👩‍🏫 Vista Maestro</button>
+      <button class="view-btn" data-view="admin">🏫 Vista General</button>
+    </div>
+
+    <div id="notasMaestro">
+      <div class="grade-select">
+        <select id="notaGrado"></select>
+        <select id="notaMateria">
+          <option>Matemáticas</option>
+          <option>Español</option>
+          <option>Ciencias</option>
+          <option>Sociales</option>
+        </select>
+        <button class="btn small" id="btnGuardarNotas">Guardar notas</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Alumno</th><th style="width:120px;">Nota (0-100)</th></tr></thead>
+          <tbody id="tablaNotasMaestro"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="notasAdmin" style="display:none;">
+      <div class="card" style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Alumno</th><th>Matemáticas</th><th>Español</th><th>Ciencias</th><th>Sociales</th><th>Promedio</th></tr></thead>
+          <tbody id="tablaNotasAdmin"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>ColegioPanel — Demo interactivo desarrollado por NexCode GT</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- DATA ----------
+const GRADOS = ["1ro Primaria","2do Primaria","3ro Primaria","4to Primaria","5to Primaria","6to Primaria"];
+const MATERIAS = ["Matemáticas","Español","Ciencias","Sociales"];
+
+let students = [
+  {id:1, nombre:"Ana Martínez", grado:"3ro Primaria", telefono:"5511-2233", monto:450, pago:"pagado", asistPresente:0, asistTotal:0, hoy:true, notas:{}},
+  {id:2, nombre:"Carlos Pérez", grado:"3ro Primaria", telefono:"5522-3344", monto:450, pago:"pendiente", asistPresente:0, asistTotal:0, hoy:true, notas:{}},
+  {id:3, nombre:"Lucía Ramírez", grado:"1ro Primaria", telefono:"5533-4455", monto:400, pago:"pagado", asistPresente:0, asistTotal:0, hoy:true, notas:{}},
+  {id:4, nombre:"Diego Hernández", grado:"1ro Primaria", telefono:"5544-5566", monto:400, pago:"atrasado", asistPresente:0, asistTotal:0, hoy:false, notas:{}},
+  {id:5, nombre:"Sofía López", grado:"5to Primaria", telefono:"5555-6677", monto:500, pago:"pagado", asistPresente:0, asistTotal:0, hoy:true, notas:{}},
+  {id:6, nombre:"Mateo García", grado:"5to Primaria", telefono:"5566-7788", monto:500, pago:"pendiente", asistPresente:0, asistTotal:0, hoy:true, notas:{}},
+];
+let nextId = 7;
+let diaActual = 1;
+
+// ---------- HELPERS ----------
+function initials(name){ return name.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase(); }
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2200);
+}
+function fillGradeSelects(){
+  [document.getElementById("asisGrado"), document.getElementById("notaGrado")].forEach(sel=>{
+    sel.innerHTML = GRADOS.map(g=>`<option>${g}</option>`).join("");
+  });
+}
+
+// ---------- TABS ----------
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("panel-"+btn.dataset.tab).classList.add("active");
+  });
+});
+
+// view toggles (asistencia + notas), scoped per section
+document.querySelectorAll(".panel").forEach(panel=>{
+  const buttons = panel.querySelectorAll(".view-btn");
+  buttons.forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      buttons.forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      const view = btn.dataset.view;
+      if(panel.id === "panel-asistencia"){
+        document.getElementById("asistenciaMaestro").style.display = view==="maestro" ? "block":"none";
+        document.getElementById("asistenciaAdmin").style.display = view==="admin" ? "block":"none";
+        if(view==="admin") renderAsistenciaAdmin();
+      } else if(panel.id === "panel-notas"){
+        document.getElementById("notasMaestro").style.display = view==="maestro" ? "block":"none";
+        document.getElementById("notasAdmin").style.display = view==="admin" ? "block":"none";
+        if(view==="admin") renderNotasAdmin();
+      }
+    });
+  });
+});
+
+// ---------- INSCRIPCIONES ----------
+document.getElementById("formInscripcion").addEventListener("submit", e=>{
+  e.preventDefault();
+  const nombre = document.getElementById("inNombre").value.trim();
+  const grado = document.getElementById("inGrado").value;
+  const telefono = document.getElementById("inTelefono").value.trim() || "—";
+  if(!nombre) return;
+  students.push({id:nextId++, nombre, grado, telefono, monto: grado.startsWith("1")||grado.startsWith("2") ? 400 : (grado.startsWith("3")||grado.startsWith("4") ? 450 : 500), pago:"pendiente", asistPresente:0, asistTotal:0, hoy:true, notas:{}});
+  document.getElementById("formInscripcion").reset();
+  showToast(`✅ ${nombre} inscrito correctamente`);
+  renderAll();
+});
+
+function renderInscripciones(){
+  const tbody = document.getElementById("tablaInscripciones");
+  if(students.length===0){ tbody.innerHTML = `<tr><td colspan="4" class="empty">Aún no hay alumnos inscritos</td></tr>`; return; }
+  tbody.innerHTML = students.map(s=>`
+    <tr>
+      <td class="name-cell"><span class="avatar">${initials(s.nombre)}</span>${s.nombre}</td>
+      <td>${s.grado}</td>
+      <td>${s.telefono}</td>
+      <td><span class="badge ${s.pago}">${s.pago[0].toUpperCase()+s.pago.slice(1)}</span></td>
+    </tr>`).join("");
+  document.getElementById("statAlumnos").textContent = students.length;
+}
+
+// ---------- MENSUALIDADES ----------
+const cycle = {pagado:"pendiente", pendiente:"atrasado", atrasado:"pagado"};
+function renderMensualidades(){
+  const tbody = document.getElementById("tablaMensualidades");
+  if(students.length===0){ tbody.innerHTML = `<tr><td colspan="4" class="empty">No hay alumnos registrados</td></tr>`; return; }
+  tbody.innerHTML = students.map(s=>`
+    <tr>
+      <td class="name-cell"><span class="avatar">${initials(s.nombre)}</span>${s.nombre}</td>
+      <td>${s.grado}</td>
+      <td>Q${s.monto}</td>
+      <td><button class="badge ${s.pago}" data-id="${s.id}">${s.pago[0].toUpperCase()+s.pago.slice(1)}</button></td>
+    </tr>`).join("");
+
+  tbody.querySelectorAll(".badge").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const s = students.find(x=>x.id==b.dataset.id);
+      s.pago = cycle[s.pago];
+      renderAll();
+    });
+  });
+
+  const cobrado = students.filter(s=>s.pago==="pagado").reduce((a,s)=>a+s.monto,0);
+  const pendientes = students.filter(s=>s.pago==="pendiente").length;
+  const atrasados = students.filter(s=>s.pago==="atrasado").length;
+  document.getElementById("mCobrado").textContent = "Q"+cobrado.toLocaleString();
+  document.getElementById("mPendiente").textContent = pendientes;
+  document.getElementById("mAtrasado").textContent = atrasados;
+  document.getElementById("statCobrado").textContent = "Q"+cobrado.toLocaleString();
+}
+
+// ---------- ASISTENCIA ----------
+function renderAsistenciaMaestro(){
+  const grado = document.getElementById("asisGrado").value;
+  const tbody = document.getElementById("tablaAsistenciaMaestro");
+  const list = students.filter(s=>s.grado===grado);
+  document.getElementById("diaActual").textContent = "Día " + diaActual;
+  if(list.length===0){ tbody.innerHTML = `<tr><td colspan="2" class="empty">No hay alumnos en este grado</td></tr>`; return; }
+  tbody.innerHTML = list.map(s=>`
+    <tr>
+      <td class="name-cell"><span class="avatar">${initials(s.nombre)}</span>${s.nombre}</td>
+      <td style="text-align:right;">
+        <label class="switch">
+          <input type="checkbox" ${s.hoy? "checked":""} data-id="${s.id}">
+          <span class="slider"></span>
+        </label>
+      </td>
+    </tr>`).join("");
+  tbody.querySelectorAll("input[type=checkbox]").forEach(chk=>{
+    chk.addEventListener("change", ()=>{
+      const s = students.find(x=>x.id==chk.dataset.id);
+      s.hoy = chk.checked;
+    });
+  });
+}
+
+document.getElementById("btnRegistrarAsistencia").addEventListener("click", ()=>{
+  const grado = document.getElementById("asisGrado").value;
+  const list = students.filter(s=>s.grado===grado);
+  list.forEach(s=>{
+    s.asistTotal += 1;
+    if(s.hoy) s.asistPresente += 1;
+  });
+  diaActual += 1;
+  showToast(`📌 Asistencia registrada para ${grado} — Día ${diaActual-1}`);
+  renderAll();
+});
+
+function renderAsistenciaAdmin(){
+  const tbody = document.getElementById("tablaAsistenciaAdmin");
+  let rows = [];
+  let totalPresente = 0, totalPosible = 0;
+  GRADOS.forEach(g=>{
+    const list = students.filter(s=>s.grado===g);
+    if(list.length===0) return;
+    const presente = list.reduce((a,s)=>a+s.asistPresente,0);
+    const total = list.reduce((a,s)=>a+s.asistTotal,0);
+    totalPresente += presente; totalPosible += total;
+    const pct = total>0 ? Math.round((presente/total)*100) : null;
+    rows.push(`
+      <tr>
+        <td>${g}</td>
+        <td>${list.length}</td>
+        <td>
+          ${pct===null ? '<span style="color:var(--text-light);font-size:12.5px;">Sin registros aún</span>' : `
+          <div style="display:flex;align-items:center;gap:10px;">
+            <strong>${pct}%</strong>
+            <div class="bar-bg" style="flex:1;"><div class="bar-fill" style="width:${pct}%;"></div></div>
+          </div>`}
+        </td>
+      </tr>`);
+  });
+  tbody.innerHTML = rows.join("") || `<tr><td colspan="3" class="empty">No hay grados con alumnos</td></tr>`;
+  const globalPct = totalPosible>0 ? Math.round((totalPresente/totalPosible)*100) : 0;
+  document.getElementById("statAsistencia").textContent = globalPct + "%";
+}
+
+// ---------- NOTAS ----------
+function renderNotasMaestro(){
+  const grado = document.getElementById("notaGrado").value;
+  const materia = document.getElementById("notaMateria").value;
+  const tbody = document.getElementById("tablaNotasMaestro");
+  const list = students.filter(s=>s.grado===grado);
+  if(list.length===0){ tbody.innerHTML = `<tr><td colspan="2" class="empty">No hay alumnos en este grado</td></tr>`; return; }
+  tbody.innerHTML = list.map(s=>`
+    <tr>
+      <td class="name-cell"><span class="avatar">${initials(s.nombre)}</span>${s.nombre}</td>
+      <td><input type="number" min="0" max="100" class="nota-input" data-id="${s.id}" value="${s.notas[materia] ?? ''}" placeholder="—"></td>
+    </tr>`).join("");
+}
+
+document.getElementById("btnGuardarNotas").addEventListener("click", ()=>{
+  const materia = document.getElementById("notaMateria").value;
+  const grado = document.getElementById("notaGrado").value;
+  document.querySelectorAll("#tablaNotasMaestro .nota-input").forEach(inp=>{
+    const s = students.find(x=>x.id==inp.dataset.id);
+    if(inp.value !== "") s.notas[materia] = Math.max(0, Math.min(100, Number(inp.value)));
+  });
+  showToast(`✅ Notas de ${materia} guardadas para ${grado}`);
+});
+
+function renderNotasAdmin(){
+  const tbody = document.getElementById("tablaNotasAdmin");
+  if(students.length===0){ tbody.innerHTML = `<tr><td colspan="6" class="empty">No hay alumnos registrados</td></tr>`; return; }
+  tbody.innerHTML = students.map(s=>{
+    const vals = MATERIAS.map(m=>s.notas[m]);
+    const present = vals.filter(v=>v!==undefined);
+    const avg = present.length ? Math.round(present.reduce((a,b)=>a+b,0)/present.length) : null;
+    return `
+    <tr>
+      <td class="name-cell"><span class="avatar">${initials(s.nombre)}</span>${s.nombre}</td>
+      ${MATERIAS.map(m=>`<td>${s.notas[m] ?? '<span style="color:var(--text-light);">—</span>'}</td>`).join("")}
+      <td>${avg===null ? '<span style="color:var(--text-light);">—</span>' : `<span class="nota-avg ${avg>=70?'good':'bad'}">${avg}</span>`}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ---------- MASTER RENDER ----------
+function renderAll(){
+  renderInscripciones();
+  renderMensualidades();
+  renderAsistenciaMaestro();
+  renderNotasMaestro();
+  if(document.getElementById("asistenciaAdmin").style.display !== "none") renderAsistenciaAdmin();
+  else { // keep header stat fresh regardless of active view
+    const totalPresente = students.reduce((a,s)=>a+s.asistPresente,0);
+    const totalPosible = students.reduce((a,s)=>a+s.asistTotal,0);
+    document.getElementById("statAsistencia").textContent = (totalPosible>0 ? Math.round((totalPresente/totalPosible)*100) : 0) + "%";
+  }
+  if(document.getElementById("notasAdmin").style.display !== "none") renderNotasAdmin();
+}
+
+document.getElementById("asisGrado").addEventListener("change", renderAsistenciaMaestro);
+document.getElementById("notaGrado").addEventListener("change", renderNotasMaestro);
+document.getElementById("notaMateria").addEventListener("change", renderNotasMaestro);
+
+// ---------- INIT ----------
+fillGradeSelects();
+renderAll();
+</script>
+</body>
+</html>
