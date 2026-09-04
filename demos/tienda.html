@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Esquina · Sistema de tienda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F2E7;
+    --paper-deep:#EFE7D4;
+    --ink:#26241D;
+    --ink-soft:#5B5748;
+    --green:#2E4E3F;
+    --green-deep:#213A2F;
+    --marigold:#D89A2B;
+    --brick:#A8402F;
+    --line:#D8CFB8;
+    --line-strong:#B9AD8C;
+    --white:#FFFDF8;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  html,body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  button{font-family:inherit;}
+  input,select,textarea{font-family:inherit;}
+
+  /* ---------- layout shell ---------- */
+  .shell{
+    display:flex;
+    min-height:100vh;
+  }
+  .sidebar{
+    width:220px;
+    flex-shrink:0;
+    background:var(--green);
+    color:var(--white);
+    display:flex;
+    flex-direction:column;
+    padding:22px 0;
+  }
+  .brand{
+    padding:0 20px 20px 20px;
+    border-bottom:1px solid rgba(255,255,255,0.18);
+    margin-bottom:14px;
+  }
+  .brand .display{
+    font-size:22px;
+    color:var(--white);
+    margin:0 0 2px 0;
+    line-height:1.1;
+  }
+  .brand .sub{
+    font-size:11.5px;
+    color:rgba(255,255,255,0.65);
+    letter-spacing:.02em;
+  }
+  .nav-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 20px;
+    color:rgba(255,255,255,0.78);
+    cursor:pointer;
+    font-size:14.5px;
+    border-left:3px solid transparent;
+    transition:background .12s ease, color .12s ease;
+  }
+  .nav-item:hover{
+    background:rgba(255,255,255,0.06);
+    color:var(--white);
+  }
+  .nav-item.active{
+    background:rgba(255,255,255,0.1);
+    color:var(--white);
+    border-left:3px solid var(--marigold);
+    font-weight:600;
+  }
+  .nav-icon{
+    width:18px;height:18px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .nav-badge{
+    margin-left:auto;
+    background:var(--brick);
+    color:var(--white);
+    font-size:10.5px;
+    font-weight:700;
+    padding:1px 6px;
+    border-radius:20px;
+    min-width:16px;
+    text-align:center;
+  }
+  .sidebar-foot{
+    margin-top:auto;
+    padding:14px 20px 4px 20px;
+    font-size:11px;
+    color:rgba(255,255,255,0.45);
+    border-top:1px solid rgba(255,255,255,0.14);
+  }
+
+  .main{
+    flex:1;
+    min-width:0;
+    padding:34px 42px 60px 42px;
+  }
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:26px;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  .topbar h1{font-size:26px;margin:0;}
+  .topbar .desc{color:var(--ink-soft);font-size:13.5px;margin-top:4px;}
+  .today{
+    text-align:right;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    line-height:1.5;
+  }
+  .today b{color:var(--ink);}
+
+  /* ---------- generic bits ---------- */
+  .btn{
+    background:var(--green);
+    color:var(--white);
+    border:none;
+    padding:9px 16px;
+    font-size:13.5px;
+    font-weight:600;
+    cursor:pointer;
+    border-radius:3px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    transition:background .12s ease;
+  }
+  .btn:hover{background:var(--green-deep);}
+  .btn.secondary{
+    background:transparent;
+    color:var(--green);
+    border:1px solid var(--line-strong);
+  }
+  .btn.secondary:hover{background:var(--paper-deep);}
+  .btn.danger{background:transparent;color:var(--brick);border:1px solid rgba(168,64,47,0.4);}
+  .btn.danger:hover{background:rgba(168,64,47,0.08);}
+  .btn.small{padding:5px 10px;font-size:12px;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+
+  .card{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:4px;
+  }
+
+  .stat-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-bottom:28px;
+  }
+  .stat{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:16px 18px;
+    position:relative;
+  }
+  .stat .label{font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
+  .stat .value{font-family:'Fraunces',serif;font-size:26px;font-weight:600;}
+  .stat .value.alert{color:var(--brick);}
+  .stat .accent{
+    position:absolute;top:0;left:0;bottom:0;width:3px;
+    background:var(--marigold);border-radius:4px 0 0 4px;
+  }
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  thead th{
+    text-align:left;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    font-weight:600;
+    padding:0 14px 10px 14px;
+    border-bottom:1px solid var(--line-strong);
+  }
+  tbody td{
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--paper-deep);}
+  .num{text-align:right;font-variant-numeric:tabular-nums;}
+  .muted{color:var(--ink-soft);}
+  .pill{
+    display:inline-block;
+    font-size:11px;
+    font-weight:600;
+    padding:2px 9px;
+    border-radius:20px;
+  }
+  .pill.ok{background:rgba(46,78,63,0.1);color:var(--green);}
+  .pill.low{background:rgba(216,154,43,0.16);color:#8f6512;}
+  .pill.out{background:rgba(168,64,47,0.12);color:var(--brick);}
+
+  .section-head{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;flex-wrap:wrap;gap:10px;
+  }
+  .search{
+    padding:8px 12px;
+    border:1px solid var(--line-strong);
+    border-radius:3px;
+    background:var(--white);
+    font-size:13.5px;
+    width:230px;
+  }
+  .search:focus{outline:none;border-color:var(--green);}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+  .empty{
+    padding:50px 20px;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:13.5px;
+  }
+
+  /* ---------- modal ---------- */
+  .overlay{
+    position:fixed;inset:0;
+    background:rgba(38,36,29,0.45);
+    display:none;
+    align-items:flex-start;justify-content:center;
+    padding:40px 16px;
+    overflow-y:auto;
+    z-index:50;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:var(--paper);
+    border:1px solid var(--line-strong);
+    border-radius:5px;
+    width:100%;max-width:520px;
+    padding:26px 26px 22px 26px;
+  }
+  .modal h3{margin:0 0 18px 0;font-size:19px;}
+  .field{margin-bottom:13px;}
+  .field label{
+    display:block;font-size:12px;color:var(--ink-soft);
+    margin-bottom:5px;font-weight:600;
+  }
+  .field input, .field select, .field textarea{
+    width:100%;
+    padding:9px 11px;
+    border:1px solid var(--line-strong);
+    border-radius:3px;
+    background:var(--white);
+    font-size:14px;
+    color:var(--ink);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:none;border-color:var(--green);
+  }
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .modal-actions{
+    display:flex;justify-content:flex-end;gap:8px;margin-top:20px;
+  }
+
+  /* ---------- facturacion ---------- */
+  .billing-grid{
+    display:grid;
+    grid-template-columns:1.3fr 0.9fr;
+    gap:22px;
+    align-items:start;
+  }
+  .catalog-item{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 14px;border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .catalog-item:hover{background:var(--paper-deep);}
+  .catalog-item:last-child{border-bottom:none;}
+  .catalog-item .ci-name{font-size:13.5px;}
+  .catalog-item .ci-meta{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .catalog-item .ci-price{font-weight:600;font-size:13.5px;}
+
+  .receipt{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:22px 22px 18px 22px;
+    position:sticky;
+    top:20px;
+  }
+  .receipt-head{
+    text-align:center;
+    border-bottom:1px dashed var(--line-strong);
+    padding-bottom:14px;margin-bottom:14px;
+  }
+  .receipt-head .display{font-size:19px;margin-bottom:2px;}
+  .receipt-head .sub{font-size:11.5px;color:var(--ink-soft);}
+  .receipt-line{
+    display:flex;justify-content:space-between;
+    font-size:13px;padding:6px 0;
+    border-bottom:1px solid var(--line);
+    gap:8px;
+  }
+  .receipt-line .rl-name{flex:1;}
+  .receipt-line .rl-qty{color:var(--ink-soft);width:70px;text-align:center;}
+  .receipt-line .rl-total{width:70px;text-align:right;font-variant-numeric:tabular-nums;}
+  .receipt-line button{
+    background:none;border:none;color:var(--brick);
+    cursor:pointer;font-size:15px;padding:0 0 0 6px;line-height:1;
+  }
+  .receipt-totals{
+    margin-top:14px;padding-top:12px;
+    border-top:1px dashed var(--line-strong);
+  }
+  .receipt-totals .row{
+    display:flex;justify-content:space-between;font-size:13px;
+    padding:3px 0;
+  }
+  .receipt-totals .row.grand{
+    font-family:'Fraunces',serif;font-weight:600;font-size:19px;
+    padding-top:8px;
+  }
+  .qty-input{
+    width:46px;padding:5px 4px;text-align:center;
+    border:1px solid var(--line-strong);border-radius:3px;font-size:13px;
+  }
+
+  .receipt-view{
+    max-width:360px;margin:0 auto;
+    background:var(--white);border:1px solid var(--line);
+    padding:22px;border-radius:4px;
+  }
+
+  @media(max-width:920px){
+    .shell{flex-direction:column;}
+    .sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:12px;align-items:center;}
+    .brand{display:none;}
+    .nav-item{border-left:none;border-bottom:3px solid transparent;flex-shrink:0;padding:9px 14px;}
+    .nav-item.active{border-left:none;border-bottom:3px solid var(--marigold);}
+    .sidebar-foot{display:none;}
+    .main{padding:22px 16px 50px 16px;}
+    .stat-row{grid-template-columns:1fr 1fr;}
+    .billing-grid{grid-template-columns:1fr;}
+    .field-row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <nav class="sidebar">
+    <div class="brand">
+      <div class="display">La Esquina</div>
+      <div class="sub">abarrotes &amp; uso diario</div>
+    </div>
+    <div class="nav-item active" data-view="dashboard">
+      <span class="nav-icon">▤</span> Panel
+    </div>
+    <div class="nav-item" data-view="inventario">
+      <span class="nav-icon">▥</span> Inventario
+      <span class="nav-badge" id="badge-inv" style="display:none;"></span>
+    </div>
+    <div class="nav-item" data-view="clientes">
+      <span class="nav-icon">☺</span> Clientes
+    </div>
+    <div class="nav-item" data-view="proveedores">
+      <span class="nav-icon">⛟</span> Proveedores
+    </div>
+    <div class="nav-item" data-view="facturacion">
+      <span class="nav-icon">✎</span> Facturación
+    </div>
+    <div class="nav-item" data-view="historial">
+      <span class="nav-icon">☰</span> Historial de ventas
+    </div>
+    <div class="sidebar-foot">Sistema demo · datos de ejemplo<br>se reinician al recargar</div>
+  </nav>
+
+  <main class="main" id="main"></main>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+/* ============================================================
+   DATOS EN MEMORIA
+   ============================================================ */
+let db = {
+  products: [
+    {id:1, name:"Arroz Diamante 1kg", category:"Granos", stock:42, cost:16.5, price:22, supplierId:1, minStock:10},
+    {id:2, name:"Frijol negro 1kg", category:"Granos", stock:8, cost:19, price:26, supplierId:1, minStock:10},
+    {id:3, name:"Aceite La Favorita 1L", category:"Abarrotes", stock:15, cost:28, price:36, supplierId:2, minStock:6},
+    {id:4, name:"Leche entera 1L", category:"Lácteos", stock:3, cost:17, price:23, supplierId:3, minStock:12},
+    {id:5, name:"Huevo blanco 30pz", category:"Lácteos", stock:9, cost:52, price:68, supplierId:3, minStock:5},
+    {id:6, name:"Refresco cola 600ml", category:"Bebidas", stock:36, cost:9, price:14, supplierId:4, minStock:12},
+    {id:7, name:"Agua embotellada 1L", category:"Bebidas", stock:0, cost:5, price:9, supplierId:4, minStock:15},
+    {id:8, name:"Jabón de baño", category:"Uso diario", stock:22, cost:6.5, price:11, supplierId:2, minStock:8},
+    {id:9, name:"Papel higiénico 4pz", category:"Uso diario", stock:14, cost:24, price:32, supplierId:2, minStock:6},
+    {id:10, name:"Pan de caja", category:"Panadería", stock:6, cost:21, price:28, supplierId:5, minStock:8},
+    {id:11, name:"Café soluble 200g", category:"Abarrotes", stock:11, cost:38, price:52, supplierId:1, minStock:5},
+    {id:12, name:"Detergente en polvo 1kg", category:"Uso diario", stock:17, cost:22, price:30, supplierId:2, minStock:6},
+  ],
+  clients: [
+    {id:1, name:"Rosa Martínez", phone:"555-201-3341", email:"rosa.mtz@mail.com", address:"Calle Olivo 45", balance:0},
+    {id:2, name:"Don Efraín López", phone:"555-118-2290", email:"", address:"Av. Reforma 12", balance:145.5},
+    {id:3, name:"Comedor \"El Buen Sazón\"", phone:"555-330-7712", email:"buensazon@mail.com", address:"Mercado local, local 8", balance:0},
+    {id:4, name:"Público general", phone:"", email:"", address:"", balance:0, generic:true},
+  ],
+  suppliers: [
+    {id:1, name:"Distribuidora del Valle", contact:"Marco Trejo", phone:"555-902-1187", email:"ventas@delvalle.mx", items:"Granos, café"},
+    {id:2, name:"Grupo Higia S.A.", contact:"Paola Núñez", phone:"555-774-2200", email:"pedidos@higia.mx", items:"Limpieza, aceites, uso diario"},
+    {id:3, name:"Lácteos San Miguel", contact:"Iván Ríos", phone:"555-410-9932", email:"pedidos@sanmiguel.mx", items:"Lácteos y huevo"},
+    {id:4, name:"Embotelladora Norte", contact:"Cecilia Gómez", phone:"555-663-5521", email:"cecilia@embnorte.mx", items:"Bebidas"},
+    {id:5, name:"Panificadora La Espiga", contact:"Rubén Castañeda", phone:"555-822-4409", email:"laespiga@mail.com", items:"Pan y repostería"},
+  ],
+  sales: [],
+  nextIds: {product:13, client:5, supplier:6, sale:1001}
+};
+
+let currentView = "dashboard";
+let cart = [];               // {productId, qty}
+let cartClientId = 4;        // publico general
+let editingId = null;        // usado por modales de edición
+let filterText = { inventario:"", clientes:"", proveedores:"" };
+let receiptToView = null;
+
+const fmt = n => "$" + Number(n).toFixed(2);
+const todayStr = () => new Date().toLocaleDateString('es-MX', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+const timeStr = () => new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+
+function supplierName(id){
+  const s = db.suppliers.find(s=>s.id===id);
+  return s ? s.name : "—";
+}
+function clientName(id){
+  const c = db.clients.find(c=>c.id===id);
+  return c ? c.name : "Público general";
+}
+function stockStatus(p){
+  if(p.stock<=0) return "out";
+  if(p.stock<=p.minStock) return "low";
+  return "ok";
+}
+
+/* ============================================================
+   NAVEGACIÓN
+   ============================================================ */
+document.querySelectorAll(".nav-item").forEach(el=>{
+  el.addEventListener("click", ()=>{
+    currentView = el.dataset.view;
+    document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+    el.classList.add("active");
+    cart = [];
+    render();
+  });
+});
+
+function render(){
+  updateBadge();
+  const main = document.getElementById("main");
+  if(currentView==="dashboard") main.innerHTML = viewDashboard();
+  else if(currentView==="inventario") main.innerHTML = viewInventario();
+  else if(currentView==="clientes") main.innerHTML = viewClientes();
+  else if(currentView==="proveedores") main.innerHTML = viewProveedores();
+  else if(currentView==="facturacion") main.innerHTML = viewFacturacion();
+  else if(currentView==="historial") main.innerHTML = viewHistorial();
+  attachViewHandlers();
+}
+
+function updateBadge(){
+  const lowCount = db.products.filter(p=>stockStatus(p)!=="ok").length;
+  const badge = document.getElementById("badge-inv");
+  if(lowCount>0){ badge.style.display="inline-block"; badge.textContent = lowCount; }
+  else badge.style.display="none";
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+function viewDashboard(){
+  const totalStockValue = db.products.reduce((s,p)=>s+p.stock*p.cost,0);
+  const lowStock = db.products.filter(p=>stockStatus(p)!=="ok");
+  const today = new Date().toDateString();
+  const salesToday = db.sales.filter(s=> new Date(s.date).toDateString()===today);
+  const salesTodayTotal = salesToday.reduce((s,v)=>s+v.total,0);
+  const recentSales = [...db.sales].sort((a,b)=>b.id-a.id).slice(0,6);
+
+  return `
+    <div class="topbar">
+      <div>
+        <h1>Panel general</h1>
+        <div class="desc">Resumen del día en La Esquina</div>
+      </div>
+      <div class="today"><b style="text-transform:capitalize">${todayStr()}</b></div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><div class="accent"></div>
+        <div class="label">Ventas de hoy</div>
+        <div class="value">${fmt(salesTodayTotal)}</div>
+      </div>
+      <div class="stat"><div class="accent"></div>
+        <div class="label">Tickets emitidos hoy</div>
+        <div class="value">${salesToday.length}</div>
+      </div>
+      <div class="stat"><div class="accent"></div>
+        <div class="label">Valor del inventario</div>
+        <div class="value">${fmt(totalStockValue)}</div>
+      </div>
+      <div class="stat"><div class="accent"></div>
+        <div class="label">Productos con stock bajo</div>
+        <div class="value ${lowStock.length>0?'alert':''}">${lowStock.length}</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:20px;">
+      <div class="card">
+        <div style="padding:16px 18px 4px 18px;">
+          <h3 style="margin:0;font-size:16px;">Últimas ventas</h3>
+        </div>
+        ${recentSales.length===0 ? `<div class="empty">Aún no se registran ventas. Ve a Facturación para crear la primera.</div>` : `
+        <table>
+          <thead><tr><th>Ticket</th><th>Cliente</th><th>Fecha</th><th class="num">Total</th></tr></thead>
+          <tbody>
+            ${recentSales.map(s=>`
+              <tr>
+                <td>#${s.id}</td>
+                <td>${clientName(s.clientId)}</td>
+                <td class="muted">${new Date(s.date).toLocaleDateString('es-MX')} ${new Date(s.date).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}</td>
+                <td class="num">${fmt(s.total)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>`}
+      </div>
+
+      <div class="card">
+        <div style="padding:16px 18px 4px 18px;">
+          <h3 style="margin:0;font-size:16px;">Por reabastecer</h3>
+        </div>
+        ${lowStock.length===0 ? `<div class="empty">Todo el inventario está en buen nivel.</div>` : `
+        <table>
+          <thead><tr><th>Producto</th><th class="num">Existencia</th></tr></thead>
+          <tbody>
+            ${lowStock.slice(0,8).map(p=>`
+              <tr>
+                <td>${p.name} <span class="pill ${stockStatus(p)}" style="margin-left:6px;">${stockStatus(p)==='out'?'agotado':'bajo'}</span></td>
+                <td class="num">${p.stock}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>`}
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   INVENTARIO
+   ============================================================ */
+function viewInventario(){
+  const q = filterText.inventario.toLowerCase();
+  const list = db.products.filter(p=>p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+  return `
+    <div class="topbar">
+      <div>
+        <h1>Inventario</h1>
+        <div class="desc">${db.products.length} productos registrados</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="padding:16px 18px;">
+        <div class="section-head">
+          <input class="search" id="inv-search" placeholder="Buscar producto o categoría…" value="${filterText.inventario}">
+          <div class="toolbar">
+            <button class="btn" id="btn-new-product">+ Nuevo producto</button>
+          </div>
+        </div>
+      </div>
+      ${list.length===0 ? `<div class="empty">No se encontraron productos.</div>` : `
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th><th>Categoría</th><th>Proveedor</th>
+            <th class="num">Costo</th><th class="num">Precio</th>
+            <th class="num">Existencia</th><th>Estado</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map(p=>`
+            <tr>
+              <td>${p.name}</td>
+              <td class="muted">${p.category}</td>
+              <td class="muted">${supplierName(p.supplierId)}</td>
+              <td class="num">${fmt(p.cost)}</td>
+              <td class="num">${fmt(p.price)}</td>
+              <td class="num">${p.stock}</td>
+              <td><span class="pill ${stockStatus(p)}">${stockStatus(p)==='ok'?'bien':stockStatus(p)==='low'?'bajo':'agotado'}</span></td>
+              <td style="white-space:nowrap;">
+                <button class="btn secondary small" data-edit-product="${p.id}">Editar</button>
+                <button class="btn danger small" data-del-product="${p.id}">Eliminar</button>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>`}
+    </div>
+  `;
+}
+
+function productForm(p){
+  const isEdit = !!p;
+  const supplierOpts = db.suppliers.map(s=>`<option value="${s.id}" ${p&&p.supplierId===s.id?'selected':''}>${s.name}</option>`).join("");
+  return `
+    <h3>${isEdit?'Editar producto':'Nuevo producto'}</h3>
+    <div class="field">
+      <label>Nombre del producto</label>
+      <input id="f-name" value="${p?p.name:''}" placeholder="Ej. Aceite La Favorita 1L">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Categoría</label>
+        <input id="f-category" value="${p?p.category:''}" placeholder="Ej. Abarrotes">
+      </div>
+      <div class="field">
+        <label>Proveedor</label>
+        <select id="f-supplier">${supplierOpts}</select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Costo (compra)</label>
+        <input id="f-cost" type="number" step="0.01" value="${p?p.cost:''}">
+      </div>
+      <div class="field">
+        <label>Precio de venta</label>
+        <input id="f-price" type="number" step="0.01" value="${p?p.price:''}">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Existencia actual</label>
+        <input id="f-stock" type="number" value="${p?p.stock:0}">
+      </div>
+      <div class="field">
+        <label>Existencia mínima (alerta)</label>
+        <input id="f-minstock" type="number" value="${p?p.minStock:5}">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" id="btn-cancel">Cancelar</button>
+      <button class="btn" id="btn-save-product">${isEdit?'Guardar cambios':'Agregar producto'}</button>
+    </div>
+  `;
+}
+
+/* ============================================================
+   CLIENTES
+   ============================================================ */
+function viewClientes(){
+  const q = filterText.clientes.toLowerCase();
+  const list = db.clients.filter(c=>!c.generic && (c.name.toLowerCase().includes(q) || (c.phone||"").includes(q)));
+  return `
+    <div class="topbar">
+      <div>
+        <h1>Clientes</h1>
+        <div class="desc">${list.length} clientes registrados</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="padding:16px 18px;">
+        <div class="section-head">
+          <input class="search" id="cli-search" placeholder="Buscar cliente o teléfono…" value="${filterText.clientes}">
+          <button class="btn" id="btn-new-client">+ Nuevo cliente</button>
+        </div>
+      </div>
+      ${list.length===0 ? `<div class="empty">No se encontraron clientes.</div>` : `
+      <table>
+        <thead><tr><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Dirección</th><th class="num">Saldo pendiente</th><th></th></tr></thead>
+        <tbody>
+          ${list.map(c=>`
+            <tr>
+              <td>${c.name}</td>
+              <td class="muted">${c.phone||'—'}</td>
+              <td class="muted">${c.email||'—'}</td>
+              <td class="muted">${c.address||'—'}</td>
+              <td class="num" style="${c.balance>0?'color:var(--brick);font-weight:600;':''}">${fmt(c.balance)}</td>
+              <td style="white-space:nowrap;">
+                <button class="btn secondary small" data-edit-client="${c.id}">Editar</button>
+                <button class="btn danger small" data-del-client="${c.id}">Eliminar</button>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>`}
+    </div>
+  `;
+}
+
+function clientForm(c){
+  const isEdit = !!c;
+  return `
+    <h3>${isEdit?'Editar cliente':'Nuevo cliente'}</h3>
+    <div class="field">
+      <label>Nombre</label>
+      <input id="f-name" value="${c?c.name:''}" placeholder="Nombre completo o negocio">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Teléfono</label>
+        <input id="f-phone" value="${c?c.phone:''}">
+      </div>
+      <div class="field">
+        <label>Correo</label>
+        <input id="f-email" value="${c?c.email:''}">
+      </div>
+    </div>
+    <div class="field">
+      <label>Dirección</label>
+      <input id="f-address" value="${c?c.address:''}">
+    </div>
+    <div class="field">
+      <label>Saldo pendiente (fiado)</label>
+      <input id="f-balance" type="number" step="0.01" value="${c?c.balance:0}">
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" id="btn-cancel">Cancelar</button>
+      <button class="btn" id="btn-save-client">${isEdit?'Guardar cambios':'Agregar cliente'}</button>
+    </div>
+  `;
+}
+
+/* ============================================================
+   PROVEEDORES
+   ============================================================ */
+function viewProveedores(){
+  const q = filterText.proveedores.toLowerCase();
+  const list = db.suppliers.filter(s=>s.name.toLowerCase().includes(q) || s.items.toLowerCase().includes(q));
+  return `
+    <div class="topbar">
+      <div>
+        <h1>Proveedores</h1>
+        <div class="desc">${db.suppliers.length} proveedores registrados</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="padding:16px 18px;">
+        <div class="section-head">
+          <input class="search" id="prov-search" placeholder="Buscar proveedor o producto…" value="${filterText.proveedores}">
+          <button class="btn" id="btn-new-supplier">+ Nuevo proveedor</button>
+        </div>
+      </div>
+      ${list.length===0 ? `<div class="empty">No se encontraron proveedores.</div>` : `
+      <table>
+        <thead><tr><th>Proveedor</th><th>Contacto</th><th>Teléfono</th><th>Correo</th><th>Suministra</th><th></th></tr></thead>
+        <tbody>
+          ${list.map(s=>`
+            <tr>
+              <td>${s.name}</td>
+              <td class="muted">${s.contact}</td>
+              <td class="muted">${s.phone}</td>
+              <td class="muted">${s.email}</td>
+              <td class="muted">${s.items}</td>
+              <td style="white-space:nowrap;">
+                <button class="btn secondary small" data-edit-supplier="${s.id}">Editar</button>
+                <button class="btn danger small" data-del-supplier="${s.id}">Eliminar</button>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>`}
+    </div>
+  `;
+}
+
+function supplierForm(s){
+  const isEdit = !!s;
+  return `
+    <h3>${isEdit?'Editar proveedor':'Nuevo proveedor'}</h3>
+    <div class="field">
+      <label>Nombre del proveedor</label>
+      <input id="f-name" value="${s?s.name:''}">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Persona de contacto</label>
+        <input id="f-contact" value="${s?s.contact:''}">
+      </div>
+      <div class="field">
+        <label>Teléfono</label>
+        <input id="f-phone" value="${s?s.phone:''}">
+      </div>
+    </div>
+    <div class="field">
+      <label>Correo</label>
+      <input id="f-email" value="${s?s.email:''}">
+    </div>
+    <div class="field">
+      <label>Qué suministra</label>
+      <input id="f-items" value="${s?s.items:''}" placeholder="Ej. Bebidas, lácteos">
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" id="btn-cancel">Cancelar</button>
+      <button class="btn" id="btn-save-supplier">${isEdit?'Guardar cambios':'Agregar proveedor'}</button>
+    </div>
+  `;
+}
+
+/* ============================================================
+   FACTURACIÓN
+   ============================================================ */
+function viewFacturacion(){
+  const clientOpts = db.clients.map(c=>`<option value="${c.id}" ${cartClientId===c.id?'selected':''}>${c.name}</option>`).join("");
+  const subtotal = cart.reduce((s,it)=>{
+    const p = db.products.find(p=>p.id===it.productId);
+    return s + (p?p.price*it.qty:0);
+  },0);
+
+  return `
+    <div class="topbar">
+      <div>
+        <h1>Facturación</h1>
+        <div class="desc">Genera un nuevo ticket de venta</div>
+      </div>
+    </div>
+    <div class="billing-grid">
+      <div class="card">
+        <div style="padding:16px 18px;">
+          <input class="search" id="bill-search" placeholder="Buscar producto para agregar…" style="width:100%;">
+        </div>
+        <div id="catalog-list">
+          ${renderCatalog("")}
+        </div>
+      </div>
+
+      <div class="receipt">
+        <div class="receipt-head">
+          <div class="display">La Esquina</div>
+          <div class="sub">Ticket de venta · ${new Date().toLocaleDateString('es-MX')} ${timeStr()}</div>
+        </div>
+
+        <div class="field">
+          <label>Cliente</label>
+          <select id="f-cart-client">${clientOpts}</select>
+        </div>
+
+        <div id="cart-lines">
+          ${cart.length===0 ? `<div class="empty" style="padding:24px 6px;">Agrega productos del catálogo para iniciar el ticket.</div>` : cart.map(it=>{
+            const p = db.products.find(p=>p.id===it.productId);
+            return `
+              <div class="receipt-line">
+                <span class="rl-name">${p.name}</span>
+                <input class="qty-input" type="number" min="1" max="${p.stock}" value="${it.qty}" data-qty="${it.productId}">
+                <span class="rl-total">${fmt(p.price*it.qty)}</span>
+                <button data-remove-cart="${it.productId}">✕</button>
+              </div>
+            `;
+          }).join("")}
+        </div>
+
+        <div class="receipt-totals">
+          <div class="row"><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
+          <div class="row grand"><span>Total</span><span>${fmt(subtotal)}</span></div>
+        </div>
+
+        <div class="modal-actions" style="margin-top:16px;">
+          <button class="btn secondary" id="btn-clear-cart" ${cart.length===0?'disabled':''}>Vaciar</button>
+          <button class="btn" id="btn-checkout" ${cart.length===0?'disabled':''}>Cobrar y emitir ticket</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCatalog(query){
+  const q = query.toLowerCase();
+  const list = db.products.filter(p=>p.name.toLowerCase().includes(q));
+  if(list.length===0) return `<div class="empty">No se encontraron productos.</div>`;
+  return list.map(p=>`
+    <div class="catalog-item" data-add-cart="${p.id}" style="${p.stock<=0?'opacity:.4;pointer-events:none;':''}">
+      <div>
+        <div class="ci-name">${p.name}</div>
+        <div class="ci-meta">${p.category} · existencia: ${p.stock}</div>
+      </div>
+      <div class="ci-price">${fmt(p.price)}</div>
+    </div>
+  `).join("");
+}
+
+/* ============================================================
+   HISTORIAL DE VENTAS
+   ============================================================ */
+function viewHistorial(){
+  const list = [...db.sales].sort((a,b)=>b.id-a.id);
+  return `
+    <div class="topbar">
+      <div>
+        <h1>Historial de ventas</h1>
+        <div class="desc">${db.sales.length} tickets emitidos en esta sesión</div>
+      </div>
+    </div>
+    <div class="card">
+      ${list.length===0 ? `<div class="empty">Todavía no hay ventas registradas.</div>` : `
+      <table>
+        <thead><tr><th>Ticket</th><th>Cliente</th><th>Fecha</th><th class="num">Artículos</th><th class="num">Total</th><th></th></tr></thead>
+        <tbody>
+          ${list.map(s=>`
+            <tr>
+              <td>#${s.id}</td>
+              <td>${clientName(s.clientId)}</td>
+              <td class="muted">${new Date(s.date).toLocaleString('es-MX')}</td>
+              <td class="num">${s.items.reduce((a,i)=>a+i.qty,0)}</td>
+              <td class="num">${fmt(s.total)}</td>
+              <td><button class="btn secondary small" data-view-receipt="${s.id}">Ver ticket</button></td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>`}
+    </div>
+  `;
+}
+
+function receiptModal(saleId){
+  const s = db.sales.find(s=>s.id===saleId);
+  return `
+    <div class="receipt-view">
+      <div class="receipt-head">
+        <div class="display">La Esquina</div>
+        <div class="sub">Ticket #${s.id} · ${new Date(s.date).toLocaleString('es-MX')}</div>
+        <div class="sub">Cliente: ${clientName(s.clientId)}</div>
+      </div>
+      ${s.items.map(it=>`
+        <div class="receipt-line">
+          <span class="rl-name">${it.name}</span>
+          <span class="rl-qty">x${it.qty}</span>
+          <span class="rl-total">${fmt(it.price*it.qty)}</span>
+        </div>
+      `).join("")}
+      <div class="receipt-totals">
+        <div class="row grand"><span>Total</span><span>${fmt(s.total)}</span></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" id="btn-cancel">Cerrar</button>
+    </div>
+  `;
+}
+
+/* ============================================================
+   MANEJO DE EVENTOS POR VISTA
+   ============================================================ */
+function attachViewHandlers(){
+  // Inventario
+  const invSearch = document.getElementById("inv-search");
+  if(invSearch) invSearch.addEventListener("input", e=>{ filterText.inventario = e.target.value; render(); document.getElementById("inv-search").focus(); document.getElementById("inv-search").selectionStart = document.getElementById("inv-search").value.length; });
+  const btnNewProduct = document.getElementById("btn-new-product");
+  if(btnNewProduct) btnNewProduct.addEventListener("click", ()=>openModal(productForm(null), ()=>saveProduct(null)));
+  document.querySelectorAll("[data-edit-product]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const p = db.products.find(p=>p.id===Number(el.dataset.editProduct));
+      openModal(productForm(p), ()=>saveProduct(p.id));
+    });
+  });
+  document.querySelectorAll("[data-del-product]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      if(confirm("¿Eliminar este producto del inventario?")){
+        db.products = db.products.filter(p=>p.id!==Number(el.dataset.delProduct));
+        render();
+      }
+    });
+  });
+
+  // Clientes
+  const cliSearch = document.getElementById("cli-search");
+  if(cliSearch) cliSearch.addEventListener("input", e=>{ filterText.clientes = e.target.value; render(); document.getElementById("cli-search").focus(); document.getElementById("cli-search").selectionStart = document.getElementById("cli-search").value.length; });
+  const btnNewClient = document.getElementById("btn-new-client");
+  if(btnNewClient) btnNewClient.addEventListener("click", ()=>openModal(clientForm(null), ()=>saveClient(null)));
+  document.querySelectorAll("[data-edit-client]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const c = db.clients.find(c=>c.id===Number(el.dataset.editClient));
+      openModal(clientForm(c), ()=>saveClient(c.id));
+    });
+  });
+  document.querySelectorAll("[data-del-client]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      if(confirm("¿Eliminar este cliente?")){
+        db.clients = db.clients.filter(c=>c.id!==Number(el.dataset.delClient));
+        render();
+      }
+    });
+  });
+
+  // Proveedores
+  const provSearch = document.getElementById("prov-search");
+  if(provSearch) provSearch.addEventListener("input", e=>{ filterText.proveedores = e.target.value; render(); document.getElementById("prov-search").focus(); document.getElementById("prov-search").selectionStart = document.getElementById("prov-search").value.length; });
+  const btnNewSupplier = document.getElementById("btn-new-supplier");
+  if(btnNewSupplier) btnNewSupplier.addEventListener("click", ()=>openModal(supplierForm(null), ()=>saveSupplier(null)));
+  document.querySelectorAll("[data-edit-supplier]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const s = db.suppliers.find(s=>s.id===Number(el.dataset.editSupplier));
+      openModal(supplierForm(s), ()=>saveSupplier(s.id));
+    });
+  });
+  document.querySelectorAll("[data-del-supplier]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      if(confirm("¿Eliminar este proveedor?")){
+        db.suppliers = db.suppliers.filter(s=>s.id!==Number(el.dataset.delSupplier));
+        render();
+      }
+    });
+  });
+
+  // Facturación
+  const billSearch = document.getElementById("bill-search");
+  if(billSearch) billSearch.addEventListener("input", e=>{
+    document.getElementById("catalog-list").innerHTML = renderCatalog(e.target.value);
+    attachCatalogHandlers();
+  });
+  attachCatalogHandlers();
+  document.querySelectorAll("[data-qty]").forEach(el=>{
+    el.addEventListener("change", ()=>{
+      const pid = Number(el.dataset.qty);
+      const p = db.products.find(p=>p.id===pid);
+      let v = Math.max(1, Math.min(p.stock, Number(el.value)||1));
+      const line = cart.find(c=>c.productId===pid);
+      line.qty = v;
+      render();
+    });
+  });
+  document.querySelectorAll("[data-remove-cart]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      cart = cart.filter(c=>c.productId!==Number(el.dataset.removeCart));
+      render();
+    });
+  });
+  const fCartClient = document.getElementById("f-cart-client");
+  if(fCartClient) fCartClient.addEventListener("change", e=>{ cartClientId = Number(e.target.value); });
+  const btnClearCart = document.getElementById("btn-clear-cart");
+  if(btnClearCart) btnClearCart.addEventListener("click", ()=>{ cart = []; render(); });
+  const btnCheckout = document.getElementById("btn-checkout");
+  if(btnCheckout) btnCheckout.addEventListener("click", checkout);
+
+  // Historial
+  document.querySelectorAll("[data-view-receipt]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      openModal(receiptModal(Number(el.dataset.viewReceipt)), null);
+    });
+  });
+}
+
+function attachCatalogHandlers(){
+  document.querySelectorAll("[data-add-cart]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const pid = Number(el.dataset.addCart);
+      const p = db.products.find(p=>p.id===pid);
+      const existing = cart.find(c=>c.productId===pid);
+      if(existing){
+        if(existing.qty < p.stock) existing.qty++;
+      } else {
+        cart.push({productId:pid, qty:1});
+      }
+      render();
+    });
+  });
+}
+
+function checkout(){
+  if(cart.length===0) return;
+  const items = cart.map(it=>{
+    const p = db.products.find(p=>p.id===it.productId);
+    return {productId:p.id, name:p.name, price:p.price, qty:it.qty};
+  });
+  const total = items.reduce((s,i)=>s+i.price*i.qty,0);
+  const sale = {
+    id: db.nextIds.sale++,
+    date: new Date().toISOString(),
+    clientId: cartClientId,
+    items, total
+  };
+  // descontar inventario
+  items.forEach(i=>{
+    const p = db.products.find(p=>p.id===i.productId);
+    p.stock = Math.max(0, p.stock - i.qty);
+  });
+  db.sales.push(sale);
+  cart = [];
+  render();
+  openModal(receiptModal(sale.id), null, "Ticket generado");
+}
+
+/* ============================================================
+   MODAL GENÉRICO + GUARDADO
+   ============================================================ */
+function openModal(html, onSave){
+  const overlay = document.getElementById("overlay");
+  const modal = document.getElementById("modal");
+  modal.innerHTML = html;
+  overlay.classList.add("show");
+  const cancelBtn = document.getElementById("btn-cancel");
+  if(cancelBtn) cancelBtn.addEventListener("click", closeModal);
+  if(onSave){
+    const saveBtn = modal.querySelector("[id^='btn-save']");
+    if(saveBtn) saveBtn.addEventListener("click", ()=>{ onSave(); });
+  }
+}
+function closeModal(){
+  document.getElementById("overlay").classList.remove("show");
+}
+document.getElementById("overlay").addEventListener("click", e=>{
+  if(e.target.id==="overlay") closeModal();
+});
+
+function saveProduct(id){
+  const name = document.getElementById("f-name").value.trim();
+  if(!name){ alert("El nombre del producto es obligatorio."); return; }
+  const data = {
+    name,
+    category: document.getElementById("f-category").value.trim() || "General",
+    supplierId: Number(document.getElementById("f-supplier").value),
+    cost: Number(document.getElementById("f-cost").value)||0,
+    price: Number(document.getElementById("f-price").value)||0,
+    stock: Number(document.getElementById("f-stock").value)||0,
+    minStock: Number(document.getElementById("f-minstock").value)||0,
+  };
+  if(id){
+    const p = db.products.find(p=>p.id===id);
+    Object.assign(p, data);
+  } else {
+    db.products.push({id: db.nextIds.product++, ...data});
+  }
+  closeModal();
+  render();
+}
+
+function saveClient(id){
+  const name = document.getElementById("f-name").value.trim();
+  if(!name){ alert("El nombre del cliente es obligatorio."); return; }
+  const data = {
+    name,
+    phone: document.getElementById("f-phone").value.trim(),
+    email: document.getElementById("f-email").value.trim(),
+    address: document.getElementById("f-address").value.trim(),
+    balance: Number(document.getElementById("f-balance").value)||0,
+  };
+  if(id){
+    const c = db.clients.find(c=>c.id===id);
+    Object.assign(c, data);
+  } else {
+    db.clients.push({id: db.nextIds.client++, ...data});
+  }
+  closeModal();
+  render();
+}
+
+function saveSupplier(id){
+  const name = document.getElementById("f-name").value.trim();
+  if(!name){ alert("El nombre del proveedor es obligatorio."); return; }
+  const data = {
+    name,
+    contact: document.getElementById("f-contact").value.trim(),
+    phone: document.getElementById("f-phone").value.trim(),
+    email: document.getElementById("f-email").value.trim(),
+    items: document.getElementById("f-items").value.trim(),
+  };
+  if(id){
+    const s = db.suppliers.find(s=>s.id===id);
+    Object.assign(s, data);
+  } else {
+    db.suppliers.push({id: db.nextIds.supplier++, ...data});
+  }
+  closeModal();
+  render();
+}
+
+/* ============================================================
+   INICIO
+   ============================================================ */
+render();
+</script>
+</body>
+</html>
